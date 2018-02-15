@@ -28,7 +28,7 @@ repository=https://github.com/ksolsrl/QgisIso4app
 # Tags are comma separated with spaces allowed
 tags=
 
-homepage=
+homepage=http://www.iso4app.com/#qgis
 category=Plugins
 icon=icon.png
 # experimental flag
