@@ -7,3 +7,7 @@ Flag to includes restricted access areas. Flag to allow bicycles on pedestrian a
 Customizable concavity level, from convex to higher concave polygon (9 concavity level).
 Customizable buffering level.
 ![Qgis iso4app plugin](http://www.iso4app.com/images/qgis_plugin_example.png)
+
+The panel of parameters:
+![Qgis iso4app parameters](http://www.iso4app.com/images/qgis_plugin_parameters.png)
+
