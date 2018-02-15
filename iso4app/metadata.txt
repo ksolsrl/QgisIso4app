@@ -16,7 +16,7 @@ email=info@k-sol.it
 
 about=The Iso4App API is a service of the K-SOL S.r.l. based onto OSM data; it's purpose is to provide isolines (isodistances and isochrones) to be used in geographic analysis. http://www.iso4app.com
 
-tracker=
+tracker=https://github.com/ksolsrl/QgisIso4app/issues
 repository=https://github.com/ksolsrl/QgisIso4app
 # End of mandatory metadata
 
