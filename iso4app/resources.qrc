@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/iso4app" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>

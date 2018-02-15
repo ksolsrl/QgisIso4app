@@ -1,0 +1,39 @@
+# This file contains metadata for your plugin. Since 
+# version 2.0 of QGIS this is the proper way to supply 
+# information about a plugin. The old method of 
+# embedding metadata in __init__.py will 
+# is no longer supported since version 2.0.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=iso4app
+qgisMinimumVersion=2.18.16
+description=iso4app isochrone/isodistance
+version=0.1
+author=Maurizio Moscati K-SOL SRL
+email=info@k-sol.it
+
+about=The Iso4App API is a service of the K-SOL S.r.l. based onto OSM data; it's purpose is to provide isolines (isodistances and isochrones) to be used in geographic analysis. http://www.iso4app.com
+
+tracker=
+repository=https://github.com/mmoscati/QgisIso4app
+# End of mandatory metadata
+
+# Recommended items:
+
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=
+
+homepage=
+category=Plugins
+icon=icon.png
+# experimental flag
+experimental=True
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
