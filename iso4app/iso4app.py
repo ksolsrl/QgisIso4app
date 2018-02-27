@@ -25,35 +25,37 @@ import sys
 import tempfile
 import gettext
 import resources
+import datetime
+from time import sleep
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from qgis.gui import *
-# Import the code for the dialog
 from iso4app_dialog import iso4appDialog
-#from clickFuUtils import cfAction
 from iso4appApi import isoline
+from iso4appApi import massiveIsoline
 from iso4appService import iso4CallService
 import iso4app_dialog
-#from iso4app_registration import Ui_DialogRegister
-#import iso4app_registration
+import iso4app_massive_dialog
 
 
 class MainPlugin(object):
  def __init__(self, iface):
   self.iface = iface
   self.dlg=iso4app_dialog.iso4appDialog()
+  self.massiveDlg=iso4app_massive_dialog.iso4appMassiveDialog()
   self.toolbar = self.iface.addToolBar(u'wfsOutputExtension')
   self.canvas=iface.mapCanvas()
   self.isoTool = QgsMapToolEmitPoint(self.canvas)
-  self.canvas.mapToolSet.connect(self.deactivate)    
+  self.selectedLayer=None  
+  self.timeStampLastMassiveRunning=datetime.datetime.now() 
   
  def name(self):
   return "Iso4App"
  def initGui(self):
   QgsMessageLog.logMessage('initGui start', 'iso4app')  
-  #self.toolbar = self.iface.addToolBar("Iso4App")
   self.isoline = isoline(self.iface,self.dlg)
+  self.massiveIsoline = massiveIsoline(self.iface,self.massiveDlg)
   
   self.requestAK = QAction("Request Api Key",self.iface.mainWindow())
   QObject.connect(self.requestAK,SIGNAL("triggered()"),self.clickRequestApiKey)
@@ -67,17 +69,26 @@ class MainPlugin(object):
   #connessione menù alla azione isoline
   self.menu=QMenu("Iso4App")
   self.menu.addActions([self.isoline])
+  self.menu.addActions([self.massiveIsoline])
   menuBar = self.iface.mainWindow().menuBar()
   menuBar.addMenu(self.menu)
   self.menu.addSeparator()
   self.menu.addAction(self.requestAK)
   
   QObject.connect(self.isoline,SIGNAL("triggered()"),self.clickParameters)
+  QObject.connect(self.massiveIsoline,SIGNAL("triggered()"),self.clickMassiveIsolines)
+  
   self.dlg.radioButtonIsochrone.toggled.connect(self.eventRbIsocrone)
   self.dlg.comboTravelType.currentIndexChanged.connect(self.eventCbTravelType)
   self.dlg.comboSpeedType.currentIndexChanged.connect(self.eventCbSpeedType)
   self.dlg.button_box.clicked.connect(self.eventOkButton)
   
+  #MASSIVE
+  self.massiveDlg.pushButtonClose.clicked.connect(self.eventButtonCloseMassive)
+  self.massiveDlg.comboBoxLayers.currentIndexChanged.connect(self.eventCbBoxLayers)
+  self.massiveDlg.comboBoxAttributes.currentIndexChanged.connect(self.eventCbBoxAttributes)
+  self.massiveDlg.pushButtonCalculate.pressed.connect(self.disableButtonGroup)
+  self.massiveDlg.pushButtonCalculate.released.connect(self.calculate_massive_isolines)
   #
   self.dlg.comboTravelType.addItem('Motor vehicle')
   self.dlg.comboTravelType.addItem('Bicycle')
@@ -229,12 +240,131 @@ class MainPlugin(object):
   QDesktopServices.openUrl(QUrl('http://www.iso4app.com#getapikey'))
  
  def place_iso(self, pointTriggered, button):
-  iso4CallService(self.iface,self.canvas,self.dlg,pointTriggered)
+  try: 
+   epsgCodeInput=self.canvas.mapSettings().destinationCrs().authid()
+   epsgCodeCanvas=self.canvas.mapSettings().destinationCrs().authid()
+  except:
+   epsgCodeInput=self.canvas.mapRenderer().destinationCrs().authid()
+   epsgCodeCanvas=self.canvas.mapRenderer().destinationCrs().authid()
+  
+  layernamePoly='tmp polygn layer'
+  layernamePin='tmp point layer'
+  vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+  vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
+  QApplication.setOverrideCursor(Qt.WaitCursor)
+  instancei4a=None
+  try:
+   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','')
+   vlyrPoly.setName(instancei4a.layernamePoly)
+   vlyrPin.setName(instancei4a.layernamePin)
+   vlyrPoly.setLayerTransparency(50)
+   QgsMapLayerRegistry.instance().addMapLayers([vlyrPin,vlyrPoly])  
+  except Exception as inst:
+   QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
+   
+  QApplication.restoreOverrideCursor() 
+  self.canvas.refresh()
+  
   return None  
   
   
  def clickParameters(self):
   self.dlg.exec_()
+ def clickMassiveIsolines(self):
+  #logica
+  
+  rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
+  comboMeters=self.dlg.comboMeters.currentIndex()
+  comboSeconds=self.dlg.comboMeters.currentIndex()
+  comboApprox=self.dlg.comboApprox.currentIndex()
+  comboConcavity=self.dlg.comboConcavity.currentIndex()
+  comboBuffering=self.dlg.comboBuffering.currentIndex()
+  comboSpeedType=self.dlg.comboSpeedType.currentIndex()
+  comboTravelType=self.dlg.comboTravelType.currentIndex()
+  checkBoxAvoidTolls=self.dlg.checkBoxAvoidTolls.isChecked()
+  checkBoxRestrictedArea=self.dlg.checkBoxRestrictedArea.isChecked()
+  checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()  
+  checkBoxAllowBikeOnPedestrian=self.dlg.checkBoxAllowBikeOnPedestrian.isChecked()
+  checkBoxAllowPedBikeOnTrunk=self.dlg.checkBoxAllowPedBikeOnTrunk.isChecked()
+  speedLimit=self.dlg.lineSpeed.text()
+  self.massiveDlg.labelCriticalMsg.setText('')
+
+  otherParam=''
+  if checkBoxAvoidTolls:
+   otherParam+=' Avoid Tolls: YES. '
+  else:
+   otherParam+=' Avoid Tolls: NO. '
+  if checkBoxRestrictedArea:
+   otherParam+=' Include Restricted Area: YES. '
+  else:
+   otherParam+=' Include Restricted Area: NO. '
+  
+  isoDescr=''
+  if rbIsochrone==True:
+   isoDescr+='ISOCHRONE'
+   valueIsoline = self.dlg.comboSeconds.currentText()
+   if comboSpeedType==0:
+    speedType=' Speed:Very Low'+'.'
+   if comboSpeedType==1:
+    speedType=' Speed:Low'+'.'
+   if comboSpeedType==2:
+    speedType=' Speed:Normal'+'.'
+   if comboSpeedType==3:
+    speedType=' Speed:Fast'+'.'
+   if checkBoxReduceQueueTime:
+    otherParam+=' Reduce queue time: YES. '
+   else:
+    otherParam+=' Reduce queue time: NO. '
+   if speedLimit!='':
+    otherParam+=' Speed Limit:'+speedLimit+'.'
+  else:
+   isoDescr+='ISODISTANCE'
+   speedType=''
+   valueIsoline = self.dlg.comboMeters.currentText()
+   
+  isoDescr+=' '+valueIsoline+'.'
+  if comboTravelType==0:
+   mobility='Motor Vehicle'
+  if comboTravelType==1:
+   mobility='Bicycle'
+   if checkBoxAllowPedBikeOnTrunk:
+    otherParam+=' Bicycle on Trunk: YES. '
+   else:
+    otherParam+=' Bicycle on Trunk: NO. '
+   if checkBoxAllowBikeOnPedestrian:
+    otherParam+=' Bicycle on Pedestrian path: YES. '
+   else:
+    otherParam+=' Bicycle on Pedestrian path: NO. '
+   
+  if comboTravelType==2:
+   mobility='Pedestrian'
+   if checkBoxAllowPedBikeOnTrunk:
+    otherParam+=' Pedestrian on Trunk: YES. '
+   else:
+    otherParam+=' Pedestrian on Trunk: NO. '
+  otherParam+=' Concavity:'+repr(comboConcavity)+'. '
+  otherParam+=' Buffering:'+repr(comboBuffering)+'. '
+  
+  isoDescr+=' Mobility:'+mobility+'.'
+  
+  approxValue=self.dlg.comboApprox.currentText()
+  isoDescr+=' Start Point Appoximation:'+approxValue+'.'
+  isoDescr+=speedType
+  isoDescr+=otherParam
+  
+  self.massiveDlg.labelIsolineDescription.setText(isoDescr)
+  
+  layersNames = []
+  self.massiveDlg.comboBoxLayers.clear()
+  self.massiveDlg.tableWidgetPoints.clear()
+  self.massiveDlg.tableWidgetPoints.setRowCount(0)
+  self.massiveDlg.comboBoxLayers.addItem('Select a layer...')
+  for i in QgsMapLayerRegistry.instance().mapLayers().values():
+   lName=i.name().encode('utf-8')
+   layersNames.append(lName)
+   self.massiveDlg.comboBoxLayers.addItem(lName)
+  
+  self.massiveDlg.exec_() 
   
  def unload(self):
   pass
@@ -257,7 +387,203 @@ class MainPlugin(object):
    self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
   manageSpeed(self)
 
+ def calculate_massive_isolines(self):
+  timeStampNow=datetime.datetime.now()
+  self.massiveDlg.labelCriticalMsg.setText('')
+  lastTimeRunning=diffMillis(self.timeStampLastMassiveRunning,timeStampNow)
+  if lastTimeRunning>1000:
+   if self.massiveDlg.lineEditLayerName.text()!='':
+    if self.selectedLayer is not None:
+     epsgCodeInput=self.selectedLayer.crs().authid()
+     QgsMessageLog.logMessage('calculate_massive_isolines epsgCodeInput:'+epsgCodeInput, 'iso4app')
+     epsgCodeCanvas=self.canvas.mapRenderer().destinationCrs().authid()
+     layernamePoly=self.massiveDlg.lineEditLayerName.text()
+     layernamePin='test pin'
+     vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+     vlyrPin = None
+
+     #gestione attributi su feature
+     idxAttrbute4Layer=self.massiveDlg.comboBoxAttributes4Layer.currentIndex()
+     attributeName4Layer=''
+     attributeValue4Layer=''
+     if idxAttrbute4Layer>0:
+      attributeName4Layer=self.massiveDlg.comboBoxAttributes4Layer.currentText()
+      
+
+     okIso=0
+     errIso=0
+     QApplication.setOverrideCursor(Qt.WaitCursor)
+     try:
+      rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
+      for row in xrange(0,rowCount):
+       coordWgsX = self.massiveDlg.tableWidgetPoints.item(row,1)
+       coordWgsY = self.massiveDlg.tableWidgetPoints.item(row,2) 
+       pointData=self.massiveDlg.tableWidgetPoints.item(row,4).data(QGis.Point)
+       if idxAttrbute4Layer>0:
+        attributeValue4Layer = self.massiveDlg.tableWidgetPoints.item(row,idxAttrbute4Layer+4).text()
+        QgsMessageLog.logMessage('calculate_massive_isolines selezionato attributo indice:'+repr(idxAttrbute4Layer)+' valore:'+attributeValue4Layer, 'iso4app')
+   
+       QgsMessageLog.logMessage('calculate_massive_isolines X:'+coordWgsX.text()+ ' Y:'+coordWgsY.text()+ ' type:'+str(type(pointData)), 'iso4app')
+       instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointData,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,attributeName4Layer,attributeValue4Layer)
+       rc=instancei4a.rc
+       rcMessageCritical=instancei4a.rcMessageCritical
+       if rc==0:
+        self.massiveDlg.tableWidgetPoints.item(row,3).setText('OK')
+        okIso=okIso+1
+       else:
+        self.massiveDlg.tableWidgetPoints.item(row,3).setText('ERR')
+        errIso=errIso+1
+       if len(rcMessageCritical)>0:
+        self.massiveDlg.labelCriticalMsg.setText('Massive elaboration STOPPED:'+rcMessageCritical)
+        break
+
+       self.massiveDlg.lineEditTotaPointOK.setText(repr(okIso))
+       self.massiveDlg.lineEditTotaPointError.setText(repr(errIso))
+       firstT = datetime.datetime.now() 
+       timeWait=0
+       while (timeWait<500):
+        currT = datetime.datetime.now()
+        timeWait=diffMillis(firstT,currT)
+      
+      if okIso>0:
+       vlyrPoly.setLayerTransparency(50)
+       QgsMapLayerRegistry.instance().addMapLayers([vlyrPin,vlyrPoly])  
+     except Exception as inst:
+      QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
+ 
+     QApplication.restoreOverrideCursor()   
+     self.canvas.refresh()
+    else:
+     self.iface.messageBar().pushMessage("Iso4App", 'Selected Layer has not any points!', level=QgsMessageBar.CRITICAL)
+   else:
+    self.iface.messageBar().pushMessage("Iso4App", 'Layer name required!', level=QgsMessageBar.CRITICAL)
+   #comunque riabilito
+   self.massiveDlg.pushButtonClose.setEnabled(True)
+   self.timeStampLastMassiveRunning=datetime.datetime.now() 
+  else:   
+   QgsMessageLog.logMessage('click pressed in massive running: SKIP:', 'iso4app')
+   self.massiveDlg.pushButtonClose.setEnabled(True)
+   
+ def disableButtonGroup(self):
+  QgsMessageLog.logMessage('disableButtonGroup triggered', 'iso4app')
+  self.massiveDlg.pushButtonClose.setEnabled(False)
+  
+ def eventCbBoxAttributes(self):
+  suggestedLayerName=''
+  if self.selectedLayer is not None:
+   idx=self.massiveDlg.comboBoxAttributes.currentIndex()
+   if idx>0:
+    rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
+    for row in xrange(0,rowCount):
+     value = self.massiveDlg.tableWidgetPoints.item(row,idx+4)
+     if len(value.text())>0:
+      suggestedLayerName+=value.text()+'_'
+     if len(suggestedLayerName)>200:
+      break
+   self.massiveDlg.lineEditLayerName.setText(suggestedLayerName)
+
+ def eventCbBoxLayers(self):
+  
+   idx=self.massiveDlg.comboBoxLayers.currentIndex()
+   self.selectedLayer=None
+   self.massiveDlg.tableWidgetPoints.clear()
+   self.massiveDlg.comboBoxAttributes.clear()
+   self.massiveDlg.comboBoxAttributes4Layer.clear()
+   self.massiveDlg.tableWidgetPoints.setRowCount(0)
+   self.massiveDlg.lineEditLayerName.setText('')
+   self.massiveDlg.lineEditTotaPoint.setText('')
+   self.massiveDlg.lineEditTotaPointOK.setText('')
+   self.massiveDlg.lineEditTotaPointError.setText('')
+   if idx>0:
+    selectedLayer = QgsMapLayerRegistry.instance().mapLayers().values()[idx-1]
+   
+    epsgCodeInput=selectedLayer.crs().authid()
+    currentCoordSystem=QgsCoordinateReferenceSystem(epsgCodeInput)
+    gpsCoordSystem=QgsCoordinateReferenceSystem(4326)
+    transformer = QgsCoordinateTransform(currentCoordSystem,gpsCoordSystem)
+    
+    attrNames=''
+    numAttr=0
+    self.massiveDlg.comboBoxAttributes.addItem('Select an attribute...')
+    self.massiveDlg.comboBoxAttributes4Layer.addItem('Select an attribute...')
+    try: 
+     for field in selectedLayer.pendingFields():
+      attributeName=field.name().encode('utf-8')
+      attrNames+=attributeName+';'
+      numAttr=numAttr+1
+      self.massiveDlg.comboBoxAttributes.addItem(attributeName)
+      self.massiveDlg.comboBoxAttributes4Layer.addItem(attributeName)
+    except Exception as ex:
+     QgsMessageLog.logMessage(ex.message ,'iso4app')
+
+    self.massiveDlg.tableWidgetPoints.setColumnCount(5+numAttr)
+    self.massiveDlg.tableWidgetPoints.setColumnWidth(0,40)
+    self.massiveDlg.tableWidgetPoints.setColumnWidth(3,50)
+    self.massiveDlg.tableWidgetPoints.setColumnWidth(4,60)
+    self.massiveDlg.tableWidgetPoints.setHorizontalHeaderLabels(('FID;LNG;LAT;STATUS;RESERVED;'+attrNames).split(";"))
+   
+    if self.dlg.checkBoxLogging.isChecked():   
+     QgsMessageLog.logMessage('Info Layer:'+repr(idx)+ ' '+selectedLayer.name()+' epsg:'+epsgCodeInput, 'iso4app') 
+    try: 
+     iter = selectedLayer.getFeatures()
+     idxRow=0
+     newSuggestedLayerName='isoline_'
+     QgsMessageLog.logMessage('before :', 'iso4app') 
+     for feature in iter:
+      geom = feature.geometry()
+      QgsMessageLog.logMessage('geom:', 'iso4app') 
+      #QgsMessageLog.logMessage('geom.type()'+geom.type(), 'iso4app') 
+      if geom.type() == QGis.Point:
+       pointOnLayer = geom.asPoint()
+       pt = transformer.transform(pointOnLayer)
+       QgsMessageLog.logMessage('point:'+str(pointOnLayer)+ ' '+str(pt), 'iso4app') 
+       itemPointX = QTableWidgetItem(str(pt.x())) 
+       itemPointY = QTableWidgetItem(str(pt.y())) 
+       itemId = QTableWidgetItem(str(feature.id()))  
+       itemStatus = QTableWidgetItem(' ')
+       itemQgisPoint = QTableWidgetItem(str(feature.id())) 
+       itemQgisPoint.setData(QGis.Point,geom.asPoint())
+       self.massiveDlg.tableWidgetPoints.insertRow(idxRow)
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,0,itemId)
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,1,itemPointX)
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,2,itemPointY) 
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,3,itemStatus)
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,4,itemQgisPoint) 
+       if numAttr>0:
+        prgTable=5 
+        valueAttr=''
+        for field in selectedLayer.pendingFields(): 
+         if type(feature[field.name()])==int:
+          valueAttr=repr(feature[field.name()])
+         if type(feature[field.name()])==long:
+          valueAttr=repr(feature[field.name()])
+         if type(feature[field.name()])==bool:
+          valueAttr=str(feature[field.name()])
+         if type(feature[field.name()])==float:
+          valueAttr=str(feature[field.name()])
+         if type(feature[field.name()])==unicode:
+          valueAttr=feature[field.name()]
+         if type(feature[field.name()])==str:
+          valueAttr=feature[field.name()]
+         self.massiveDlg.tableWidgetPoints.setItem(idxRow,prgTable,QTableWidgetItem(valueAttr))
+         prgTable=prgTable+1
+        
+       idxRow=idxRow+1
+      else:
+       QgsMessageLog.logMessage('no point', 'iso4app') 
+     if idxRow>0:
+      self.selectedLayer=selectedLayer
+     self.massiveDlg.lineEditTotaPoint.setText(repr(idxRow))
+    except:
+     QgsMessageLog.logMessage('Warning: selected layer has not any feature.' ,'iso4app')
+ 
+ def eventButtonCloseMassive(self):
+  QgsMessageLog.logMessage('eventButtonCloseMassive' ,'iso4app')
+  self.massiveDlg.close()
+  self.canvas.setMapTool(self.isoTool)
+ 
  def eventOkButton(self):
+  QgsMessageLog.logMessage('eventOkButton' ,'iso4app')
   s = QSettings()
   
   if len(self.dlg.lineApiKey.text())!=36 :
@@ -289,8 +615,12 @@ class MainPlugin(object):
   self.iface.removePluginMenu("Iso4App",self.action)
   self.iface.removeToolBarIcon(self.action)
 
- def deactivate(self):
-  QgsMessageLog.logMessage('deactivate'+repr(self.action.isChecked()), 'iso4app') 
+def diffMillis(firstT,currT):
+ diff = currT - firstT
+ millis = diff.days * 24 * 60 * 60 * 1000
+ millis += diff.seconds * 1000
+ millis += diff.microseconds / 1000
+ return millis
  
 def manageSpeed(self):
  idxTT=self.dlg.comboTravelType.currentIndex()
@@ -320,5 +650,4 @@ def manageSpeed(self):
     self.dlg.lineSpeed.setText('20')
     self.dlg.labelInfo.setText('High default speed value! Please adjust it')
  return None
- 
  

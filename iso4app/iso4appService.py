@@ -35,15 +35,27 @@ import requests
 
 
 class iso4CallService:
- def __init__(self,iface,canvas,dlg, pointTriggered):
+ def __init__(self,iface,canvas,dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,layerXPoint,layerXPolygon,attributeName4Layer,attributeValue4Layer):
   self.iface=iface
   self.dlg=dlg
+  self.attributeName4Layer=attributeName4Layer
+  self.attributeValue4Layer=attributeValue4Layer
+  self.epsgCode=epsgCodeInput
+  self.epsgCodeCanvas=epsgCodeCanvas
   self.canvas=canvas
   self.pointTriggered=pointTriggered
+  self.layerXPoint=layerXPoint
+  self.layerXPolygon=layerXPolygon
+  self.rc=-1
+  self.rcMessageCritical=''
+  self.layernamePoly=''
+  self.layernamePin=''
   self.callIsoline()
   return None
+ def __str__(self):
+  return self.rc
+  
  def callIsoline(self):
-  QApplication.setOverrideCursor(Qt.WaitCursor)
   QgsMessageLog.logMessage('place_iso start', 'iso4app')
   point = self.canvas.getCoordinateTransform().toMapPoint(self.pointTriggered.x(),self.pointTriggered.y())
   pointc = self.canvas.getCoordinateTransform().toMapCoordinates(self.pointTriggered.x(),self.pointTriggered.y())
@@ -58,11 +70,12 @@ class iso4CallService:
   
   #crs = QgsCoordinateReferenceSystem()
   #fornisce il corrente epsgCode (sistema di coordinate) settato sulla canvas
-  epsgCode=self.canvas.mapRenderer().destinationCrs().authid()
-  QgsMessageLog.logMessage('canvasReleaseEvent epsgCode:'+epsgCode, 'iso4app')
-  currentCoordSystem=QgsCoordinateReferenceSystem(epsgCode)
-  gpsCoordSystem=QgsCoordinateReferenceSystem(4326)
-  transformer = QgsCoordinateTransform(currentCoordSystem,gpsCoordSystem)
+  #epsgCodeCanvas=self.canvas.mapRenderer().destinationCrs().authid()
+  
+  QgsMessageLog.logMessage('canvasReleaseEvent epsgCode:'+self.epsgCode, 'iso4app')
+  currentCoordSystemInputPoint=QgsCoordinateReferenceSystem(self.epsgCode)
+  gpsCoordSystemIso4App=QgsCoordinateReferenceSystem(4326)
+  transformer = QgsCoordinateTransform(currentCoordSystemInputPoint,gpsCoordSystemIso4App)
   pt = transformer.transform(self.pointTriggered)
    
   if self.dlg.checkBoxLogging.isChecked():
@@ -161,22 +174,32 @@ class iso4CallService:
    coordinates=root['polygons'][0]['exterior']
    wayName=root['startPoint']['way']
    startPoint=root['startPoint']['coordinates']
+   startPointApprox=root['startPoint']['approximation']
+   
    
    aQgsPoint=QgsPoint(float(startPoint.split(' ')[1]),float(startPoint.split(' ')[0]))
-
+   
    isoType=root['type']
    distance=root['value']
    unit='seconds'
    if isoType=='ISODISTANCE':
     unit='meters'
+
+   epsgCodeCanvasNumber=int(self.epsgCodeCanvas.split(':')[1])
+   if self.dlg.checkBoxLogging.isChecked():
+    QgsMessageLog.logMessage('canvasReleaseEvent epsgCodeCanvas:'+self.epsgCodeCanvas, 'iso4app')
+    QgsMessageLog.logMessage('canvasReleaseEvent epsgCodeCanvasNumber:'+repr(epsgCodeCanvasNumber), 'iso4app')
+
+   currentCoordSystemOutputCanvas=QgsCoordinateReferenceSystem(self.epsgCodeCanvas)
+   transformerReverse = QgsCoordinateTransform(gpsCoordSystemIso4App,currentCoordSystemOutputCanvas)
+   
    points =[]
-   transformerReverse = QgsCoordinateTransform(gpsCoordSystem,currentCoordSystem)
    for isoCoord in coordinates:
     pointA=QgsPoint(isoCoord[0],isoCoord[1])
     ptReverse = transformerReverse.transform(pointA)
     points.append(ptReverse)
 
-   aQgsPointReverse = transformerReverse.transform(aQgsPoint)	
+   aQgsPointReverse = transformerReverse.transform(aQgsPoint)
    
    polygon = QgsGeometry.fromPolygon([points])  
    polyB = QgsFeature()
@@ -185,44 +208,110 @@ class iso4CallService:
    #creazione layer virtual
    if wayName=='':
     wayName='way unknow'
-   layernamePoly=isoType+': ' +repr(distance)+' '+unit+'. Coord: '+startPoint
-   layernamePin='PIN: '+' Coord: '+startPoint+' ('+wayName+')'   
-   vlyrPoly = QgsVectorLayer("Polygon?crs=EPSG:3857", layernamePoly, "memory")
-   vlyrPin =  QgsVectorLayer("Point?crs=EPSG:3857&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
+   
+   self.layernamePoly=isoType+': ' +repr(distance)+' '+unit+'. Coord: '+startPoint
+   self.layernamePin='PIN: '+' Coord: '+startPoint+' ('+wayName+')'
 
-   #crs = vlyr.crs()
-   #crs.createFromId(3857)
    try:
-    self.canvas.mapSettings().setDestinationCrs(QgsCoordinateReferenceSystem(3857))
+    self.canvas.mapSettings().setDestinationCrs(QgsCoordinateReferenceSystem(epsgCodeCanvasNumber))
    except:
-    self.canvas.mapRenderer().setDestinationCrs(QgsCoordinateReferenceSystem(3857))
+    self.canvas.mapRenderer().setDestinationCrs(QgsCoordinateReferenceSystem(epsgCodeCanvasNumber))
    
-   vlyrPoly.setCrs(QgsCoordinateReferenceSystem(3857))
-   vlyrPin.setCrs(QgsCoordinateReferenceSystem(3857))
-   dprovPin = vlyrPin.dataProvider()
-   dprovPoly = vlyrPoly.dataProvider()
-   
-   fc = int(dprovPin.featureCount())
-   QgsMessageLog.logMessage('canvasReleaseEvent fc:'+repr(fc), 'iso4app')
-   feat = QgsFeature()
-   feat.setGeometry(QgsGeometry.fromPoint(aQgsPointReverse))
-   feat.setAttributes([fc,  'Coord: '+startPoint+' ('+wayName+')', aQgsPointReverse.x(), aQgsPointReverse.y()])
-   dprovPin.addFeatures([feat])
+   dprovPoly=self.layerXPolygon.dataProvider()
    dprovPoly.addFeatures([polyB])
+
+   #aggiunta attributi comunque aggiungo quelli fissi
+   self.layerXPolygon.startEditing() 
+   dprovPoly.addAttributes([ QgsField("IsolineType", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineDistance", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineDistanceUnit", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineMobility", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineStartPointLat", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineStartPointLng", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineInputStartPointLat", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineInputStartPointLng", QVariant.String)])
+   dprovPoly.addAttributes([ QgsField("IsolineStartPointApproximation", QVariant.String)])
+   #controllo aggiunta attributi del layer origine nel caso massivo
+   if self.attributeName4Layer!='':
+    dprovPoly.addAttributes([ QgsField(self.attributeName4Layer, QVariant.String)])
    
+     
+    
+   self.layerXPolygon.updateFields()
+   lastFeature=None
+   for feature in self.layerXPolygon.getFeatures():
+    lastFeature=feature
+   if lastFeature is not None:
+    QgsMessageLog.logMessage('canvasReleaseEvent featureIdCycle:'+repr(lastFeature.id()), 'iso4app')
+    attrIsolineType = 'IsolineType'
+    feature[attrIsolineType] = 1
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineType] : isoType}})
+    attrIsolineDistance = 'IsolineDistance'
+    feature[attrIsolineDistance] = 2
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineDistance] : distances}})
+    attrIsolineUnit = 'IsolineDistanceUnit'
+    feature[attrIsolineUnit] = 3
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineUnit] : unit}})
+    attrIsolineMobility = 'IsolineMobility'
+    feature[attrIsolineMobility] = 4
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineMobility] : mobility}})
+    attrIsolineLat = 'IsolineStartPointLat'
+    feature[attrIsolineLat] = 5
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLat] : aQgsPoint.y()}})
+    attrIsolineLng = 'IsolineStartPointLng'
+    feature[attrIsolineLng] = 6
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : aQgsPoint.x()}})
+    attrIsolineLng = 'IsolineInputStartPointLat'
+    feature[attrIsolineLng] = 7
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : pt.y()}})
+    attrIsolineLng = 'IsolineInputStartPointLng'
+    feature[attrIsolineLng] = 8
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : pt.x()}})
+    attrIsolineLng = 'IsolineStartPointApproximation'
+    feature[attrIsolineLng] = 9
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : startPointApprox}})
+    if self.attributeName4Layer!='':
+     feature[self.attributeName4Layer] = 10
+     dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[self.attributeName4Layer] : self.attributeValue4Layer}})
+         
+
+   self.layerXPolygon.commitChanges() 
    dprovPoly.updateExtents()
-   dprovPin.updateExtents()
-   #add layer      
-   #QgsMapLayerRegistry.instance().addMapLayers([dprovPoly])  
-   vlyrPoly.setLayerTransparency(50)
-   QgsMapLayerRegistry.instance().addMapLayers([vlyrPin,vlyrPoly])  
-   #QgsMapLayerRegistry.instance().addMapLayers([vlyrPin])  
-   self.canvas.refresh()
+   
+   #aggiunta punto a layer se diverso da null
+   if self.layerXPoint is not None:
+    dprovPin=self.layerXPoint.dataProvider()
+    feat = QgsFeature()
+    feat.setGeometry(QgsGeometry.fromPoint(aQgsPointReverse))
+    dprovPin.addFeatures([feat])
+    dprovPin.updateExtents()
+   
+   self.rc=0
+
   except ValueError:
    self.iface.messageBar().pushMessage("Iso4App", response.text, level=QgsMessageBar.CRITICAL)
+   QgsMessageLog.logMessage('canvasReleaseEvent error:'+response.text, 'iso4app')
    QgsMessageLog.logMessage('canvasReleaseEvent error:'+repr(ValueError), 'iso4app')
+   if len(response.text)>0:
+    if "(370) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(160) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(170) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(180) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(190) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(191) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(192) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+    if "(195) (1032)" in response.text: 
+     self.rcMessageCritical=response.text
+
   
-  QApplication.restoreOverrideCursor()
   QgsMessageLog.logMessage('canvasReleaseEvent end', 'iso4app')
-  return None
+  
+  
   

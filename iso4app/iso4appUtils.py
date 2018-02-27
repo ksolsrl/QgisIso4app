@@ -61,7 +61,25 @@ class iaTool(QgsMapTool):
  def canvasReleaseEvent(self,e):
   QgsMessageLog.logMessage('canvasReleaseEvent start', 'iso4app')
   point = self.canvas.getCoordinateTransform().toMapPoint(e.pos().x(),e.pos().y())
-  iso4CallService(self.iface,self.canvas,self.dlg,point)
+  epsgCodeInput=self.canvas.mapRenderer().destinationCrs().authid()
+  epsgCodeCanvas=self.canvas.mapRenderer().destinationCrs().authid()
+  layernamePoly='tmp polygn layer'
+  layernamePin='tmp point layer'
+  vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+  vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
+  QApplication.setOverrideCursor(Qt.WaitCursor)
+  try:
+   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,point,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','')
+   vlyrPoly.setName(instancei4a.layernamePoly)
+   vlyrPin.setName(instancei4a.layernamePin)
+   vlyrPoly.setLayerTransparency(50)
+   QgsMapLayerRegistry.instance().addMapLayers([vlyrPin,vlyrPoly])  
+  except Exception as inst:
+   QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
+   
+  QApplication.restoreOverrideCursor()  
+  self.canvas.refresh()
+  
   return None  
   
   
