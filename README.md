@@ -11,6 +11,19 @@ Customizable buffering level.
 ![Qgis iso4app parameters](http://www.iso4app.com/images/qgis_plugin_parameters.png)
 
 New massive isolines calculation feature is now available.
+
 You can invoke the new menu option:
+
 ![Qgis iso4app plugin](http://www.k-sol.it/iso4app/new_iso4app_menu.png)
 
+The massive isoline calculation panel will be displayed.
+
+You have to select a layer (in this example MyLayer), if the layer contains points they will be listed.
+For automatic layer name based on attributes value select an attribute from the combo, otherwise write your preferred layer name. 
+In addition you can select an attribute to add, for each polygon, in the attribute tables, so you can link the polygons to your points.
+
+![Qgis iso4app plugin](http://www.k-sol.it/iso4app/MassiveIsolineCalculation.png)
+
+An example of attribute table created for the new layer:
+
+![Qgis iso4app plugin](http://www.k-sol.it/iso4app/TableAttributes.png)
