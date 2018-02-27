@@ -10,3 +10,7 @@ Customizable buffering level.
 
 ![Qgis iso4app parameters](http://www.iso4app.com/images/qgis_plugin_parameters.png)
 
+New massive isolines calculation feature is now available.
+You can invoke the new menu option:
+![Qgis iso4app plugin](http://www.k-sol.it/iso4app/new_iso4app_menu.png)
+
