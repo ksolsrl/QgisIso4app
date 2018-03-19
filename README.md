@@ -21,6 +21,7 @@ The massive isoline calculation panel will be displayed.
 You have to select a layer (in this example MyLayer), if the layer contains points they will be listed.
 For automatic layer name based on attributes value select an attribute from the combo, otherwise write your preferred layer name. 
 In addition you can select an attribute to add, for each polygon, in the attribute tables, so you can link the polygons to your points.
+You can also select a attribute to use as a distance. This attribute will be read as meters if isodistances or minutes if isochrones.
 
 ![Qgis iso4app plugin](http://www.k-sol.it/iso4app/MassiveIsolineCalculation.png)
 
