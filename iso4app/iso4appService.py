@@ -35,7 +35,7 @@ import requests
 
 
 class iso4CallService:
- def __init__(self,iface,canvas,dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,layerXPoint,layerXPolygon,attributeName4Layer,attributeValue4Layer):
+ def __init__(self,iface,canvas,dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,layerXPoint,layerXPolygon,attributeName4Layer,attributeValue4Layer,overWrittenDistance):
   self.iface=iface
   self.dlg=dlg
   self.attributeName4Layer=attributeName4Layer
@@ -50,6 +50,7 @@ class iso4CallService:
   self.rcMessageCritical=''
   self.layernamePoly=''
   self.layernamePin=''
+  self.overWrittenDistance=overWrittenDistance
   self.callIsoline()
   return None
  def __str__(self):
@@ -79,7 +80,7 @@ class iso4CallService:
   pt = transformer.transform(self.pointTriggered)
    
   if self.dlg.checkBoxLogging.isChecked():
-   QgsMessageLog.logMessage('canvasReleaseEvent lng:'+repr(lng)+' lat:'+repr(lat)+ ' pt.y:'+repr(pt.y())+ ' pt.x:'+repr(pt.x()), 'iso4app')
+   QgsMessageLog.logMessage('callIsoline lng:'+repr(lng)+' lat:'+repr(lat)+ ' pt.y:'+repr(pt.y())+ ' pt.x:'+repr(pt.x()), 'iso4app')
   
   #chiamata al servizio iso4app  rest
   aiKey=self.dlg.lineApiKey.text()
@@ -105,6 +106,8 @@ class iso4CallService:
    valueIsochrone = self.dlg.comboSeconds.currentText()
    minutes=int(valueIsochrone.split(' ')[0])
    seconds=minutes*60
+   if self.overWrittenDistance is not None:
+    seconds=self.overWrittenDistance*60
    distances=repr(seconds) 
   else:
    restUrl=restUrl+'&type=isodistance'
@@ -115,6 +118,8 @@ class iso4CallService:
     meters=tmpValue
    if unit=='km':
     meters=tmpValue*1000
+   if self.overWrittenDistance is not None:
+    meters=self.overWrittenDistance
    distances=repr(meters) 
    
   restUrl=restUrl+'&value='+distances

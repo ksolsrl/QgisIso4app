@@ -69,7 +69,7 @@ class iaTool(QgsMapTool):
   vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
   QApplication.setOverrideCursor(Qt.WaitCursor)
   try:
-   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,point,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','')
+   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,point,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','',None)
    vlyrPoly.setName(instancei4a.layernamePoly)
    vlyrPin.setName(instancei4a.layernamePin)
    vlyrPoly.setLayerTransparency(50)

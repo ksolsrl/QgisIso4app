@@ -29,7 +29,7 @@
      <x>10</x>
      <y>80</y>
      <width>631</width>
-     <height>171</height>
+     <height>151</height>
     </rect>
    </property>
    <property name="editTriggers">
@@ -52,9 +52,9 @@
   <widget class="QLineEdit" name="lineEditLayerName">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>300</y>
-     <width>251</width>
+     <x>170</x>
+     <y>320</y>
+     <width>471</width>
      <height>21</height>
     </rect>
    </property>
@@ -62,10 +62,10 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>268</y>
-     <width>91</width>
-     <height>20</height>
+     <x>10</x>
+     <y>321</y>
+     <width>161</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
@@ -79,7 +79,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>380</y>
+     <y>390</y>
      <width>461</width>
      <height>16</height>
     </rect>
@@ -92,9 +92,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
+     <y>420</y>
      <width>631</width>
-     <height>51</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="font">
@@ -121,8 +121,8 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>270</y>
+     <x>10</x>
+     <y>288</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -134,9 +134,9 @@
   <widget class="QComboBox" name="comboBoxAttributes">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>300</y>
-     <width>181</width>
+     <x>190</x>
+     <y>285</y>
+     <width>171</width>
      <height>22</height>
     </rect>
    </property>
@@ -148,7 +148,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>530</y>
+     <y>540</y>
      <width>631</width>
      <height>51</height>
     </rect>
@@ -187,7 +187,7 @@
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>342</y>
+     <y>356</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -204,7 +204,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>343</y>
+     <y>357</y>
      <width>121</width>
      <height>16</height>
     </rect>
@@ -217,7 +217,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>342</y>
+     <y>356</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -234,7 +234,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>265</x>
-     <y>343</y>
+     <y>357</y>
      <width>41</width>
      <height>16</height>
     </rect>
@@ -247,7 +247,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>130</x>
-     <y>342</y>
+     <y>356</y>
      <width>81</width>
      <height>20</height>
     </rect>
@@ -264,7 +264,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>480</x>
-     <y>342</y>
+     <y>356</y>
      <width>61</width>
      <height>20</height>
     </rect>
@@ -277,7 +277,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>270</y>
+     <y>252</y>
      <width>181</width>
      <height>16</height>
     </rect>
@@ -289,9 +289,9 @@ color: rgb(0, 0, 0);</string>
   <widget class="QComboBox" name="comboBoxAttributes4Layer">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>300</y>
-     <width>181</width>
+     <x>190</x>
+     <y>250</y>
+     <width>171</width>
      <height>22</height>
     </rect>
    </property>
@@ -300,7 +300,7 @@ color: rgb(0, 0, 0);</string>
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>480</y>
+     <y>490</y>
      <width>631</width>
      <height>41</height>
     </rect>
@@ -316,6 +316,32 @@ color: rgb(0, 0, 0);</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_10">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>240</y>
+     <width>171</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Isoline distance by attribute value (meters or minutes)</string>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBoxAttributeAsDistance">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>284</y>
+     <width>231</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

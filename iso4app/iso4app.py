@@ -48,6 +48,7 @@ class MainPlugin(object):
   self.canvas=iface.mapCanvas()
   self.isoTool = QgsMapToolEmitPoint(self.canvas)
   self.selectedLayer=None  
+  self.isoDescr=''
   self.timeStampLastMassiveRunning=datetime.datetime.now() 
   
  def name(self):
@@ -86,6 +87,7 @@ class MainPlugin(object):
   #MASSIVE
   self.massiveDlg.pushButtonClose.clicked.connect(self.eventButtonCloseMassive)
   self.massiveDlg.comboBoxLayers.currentIndexChanged.connect(self.eventCbBoxLayers)
+  self.massiveDlg.comboBoxAttributeAsDistance.currentIndexChanged.connect(self.eventCbBoxAttributesAsDistance)
   self.massiveDlg.comboBoxAttributes.currentIndexChanged.connect(self.eventCbBoxAttributes)
   self.massiveDlg.pushButtonCalculate.pressed.connect(self.disableButtonGroup)
   self.massiveDlg.pushButtonCalculate.released.connect(self.calculate_massive_isolines)
@@ -135,7 +137,7 @@ class MainPlugin(object):
   for min in range(2,301):
    self.dlg.comboSeconds.addItem(repr(min)+' mins') 
    
-  for meters in range(400,1000):
+  for meters in range(50,1000):
    remM=meters % 10
    if remM == 0:
     self.dlg.comboMeters.addItem(repr(meters)+' meters') 
@@ -254,7 +256,7 @@ class MainPlugin(object):
   QApplication.setOverrideCursor(Qt.WaitCursor)
   instancei4a=None
   try:
-   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','')
+   instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','',None)
    vlyrPoly.setName(instancei4a.layernamePoly)
    vlyrPin.setName(instancei4a.layernamePin)
    vlyrPoly.setLayerTransparency(50)
@@ -353,6 +355,7 @@ class MainPlugin(object):
   isoDescr+=otherParam
   
   self.massiveDlg.labelIsolineDescription.setText(isoDescr)
+  self.isoDescr=isoDescr
   
   layersNames = []
   self.massiveDlg.comboBoxLayers.clear()
@@ -408,7 +411,7 @@ class MainPlugin(object):
      attributeValue4Layer=''
      if idxAttrbute4Layer>0:
       attributeName4Layer=self.massiveDlg.comboBoxAttributes4Layer.currentText()
-      
+     idxAttributeAsDistance=self.massiveDlg.comboBoxAttributeAsDistance.currentIndex()
 
      okIso=0
      errIso=0
@@ -422,28 +425,40 @@ class MainPlugin(object):
        if idxAttrbute4Layer>0:
         attributeValue4Layer = self.massiveDlg.tableWidgetPoints.item(row,idxAttrbute4Layer+4).text()
         QgsMessageLog.logMessage('calculate_massive_isolines selezionato attributo indice:'+repr(idxAttrbute4Layer)+' valore:'+attributeValue4Layer, 'iso4app')
-   
-       QgsMessageLog.logMessage('calculate_massive_isolines X:'+coordWgsX.text()+ ' Y:'+coordWgsY.text()+ ' type:'+str(type(pointData)), 'iso4app')
-       instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointData,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,attributeName4Layer,attributeValue4Layer)
-       rc=instancei4a.rc
-       rcMessageCritical=instancei4a.rcMessageCritical
-       if rc==0:
-        self.massiveDlg.tableWidgetPoints.item(row,3).setText('OK')
-        okIso=okIso+1
+       overWrittenDistance=None
+       goCalculation=False
+       if idxAttributeAsDistance>0:
+        valueDst=self.massiveDlg.tableWidgetPoints.item(row,idxAttributeAsDistance+4).text()
+        if valueDst.isdigit():
+         QgsMessageLog.logMessage('calculate_massive_isolines valueDst:'+valueDst, 'iso4app')
+         overWrittenDistance=int(valueDst)
+         QgsMessageLog.logMessage('calculate_massive_isolines overWrittenDistance:'+repr(overWrittenDistance)+ ' valueDst:'+valueDst, 'iso4app')
+         goCalculation=True
        else:
-        self.massiveDlg.tableWidgetPoints.item(row,3).setText('ERR')
-        errIso=errIso+1
-       if len(rcMessageCritical)>0:
-        self.massiveDlg.labelCriticalMsg.setText('Massive elaboration STOPPED:'+rcMessageCritical)
-        break
+        goCalculation=True
 
-       self.massiveDlg.lineEditTotaPointOK.setText(repr(okIso))
-       self.massiveDlg.lineEditTotaPointError.setText(repr(errIso))
-       firstT = datetime.datetime.now() 
-       timeWait=0
-       while (timeWait<500):
-        currT = datetime.datetime.now()
-        timeWait=diffMillis(firstT,currT)
+       if goCalculation:
+        QgsMessageLog.logMessage('calculate_massive_isolines X:'+coordWgsX.text()+ ' Y:'+coordWgsY.text()+ ' type:'+str(type(pointData))+ ' overWrittenDistance:'+repr(overWrittenDistance), 'iso4app')
+        instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointData,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,attributeName4Layer,attributeValue4Layer, overWrittenDistance)
+        rc=instancei4a.rc
+        rcMessageCritical=instancei4a.rcMessageCritical
+        if rc==0:
+         self.massiveDlg.tableWidgetPoints.item(row,3).setText('OK')
+         okIso=okIso+1
+        else:
+         self.massiveDlg.tableWidgetPoints.item(row,3).setText('ERR')
+         errIso=errIso+1
+        if len(rcMessageCritical)>0:
+         self.massiveDlg.labelCriticalMsg.setText('Massive elaboration STOPPED:'+rcMessageCritical)
+         break
+
+        self.massiveDlg.lineEditTotaPointOK.setText(repr(okIso))
+        self.massiveDlg.lineEditTotaPointError.setText(repr(errIso))
+        firstT = datetime.datetime.now() 
+        timeWait=0
+        while (timeWait<500):
+         currT = datetime.datetime.now()
+         timeWait=diffMillis(firstT,currT)
       
       if okIso>0:
        vlyrPoly.setLayerTransparency(50)
@@ -467,6 +482,24 @@ class MainPlugin(object):
  def disableButtonGroup(self):
   QgsMessageLog.logMessage('disableButtonGroup triggered', 'iso4app')
   self.massiveDlg.pushButtonClose.setEnabled(False)
+ 
+ def eventCbBoxAttributesAsDistance(self):
+  if self.selectedLayer is not None:
+   idx=self.massiveDlg.comboBoxAttributeAsDistance.currentIndex()
+   self.massiveDlg.labelCriticalMsg.setText('')
+   if idx>0:
+    rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
+    attributeValuesNotNumeric=0
+    attributeValuesNumeric=0
+    for row in xrange(0,rowCount):
+     value = self.massiveDlg.tableWidgetPoints.item(row,idx+4)
+     if value.text().isdigit():
+      attributeValuesNumeric=attributeValuesNumeric+1
+     else:
+      attributeValuesNotNumeric=attributeValuesNotNumeric+1
+    if attributeValuesNotNumeric>0:
+     self.massiveDlg.labelCriticalMsg.setText('Warning: you have choosed a value of an attribute as an isoline distance, however non numeric values are present, this points will be skipped on massive isoline calculation')
+    self.massiveDlg.labelIsolineDescription.setText(self.isoDescr+ '  --> WARNING: DEFAUT DISTANCE WILL BE OVEWRITTEN BY THE ATTRIBUTE VALUE NAMED: '+ self.massiveDlg.comboBoxAttributeAsDistance.currentText())
   
  def eventCbBoxAttributes(self):
   suggestedLayerName=''
@@ -489,6 +522,7 @@ class MainPlugin(object):
    self.massiveDlg.tableWidgetPoints.clear()
    self.massiveDlg.comboBoxAttributes.clear()
    self.massiveDlg.comboBoxAttributes4Layer.clear()
+   self.massiveDlg.comboBoxAttributeAsDistance.clear()
    self.massiveDlg.tableWidgetPoints.setRowCount(0)
    self.massiveDlg.lineEditLayerName.setText('')
    self.massiveDlg.lineEditTotaPoint.setText('')
@@ -506,6 +540,7 @@ class MainPlugin(object):
     numAttr=0
     self.massiveDlg.comboBoxAttributes.addItem('Select an attribute...')
     self.massiveDlg.comboBoxAttributes4Layer.addItem('Select an attribute...')
+    self.massiveDlg.comboBoxAttributeAsDistance.addItem('Select an attribute...')
     try: 
      for field in selectedLayer.pendingFields():
       attributeName=field.name().encode('utf-8')
@@ -513,6 +548,7 @@ class MainPlugin(object):
       numAttr=numAttr+1
       self.massiveDlg.comboBoxAttributes.addItem(attributeName)
       self.massiveDlg.comboBoxAttributes4Layer.addItem(attributeName)
+      self.massiveDlg.comboBoxAttributeAsDistance.addItem(attributeName)
     except Exception as ex:
      QgsMessageLog.logMessage(ex.message ,'iso4app')
 
