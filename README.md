@@ -23,7 +23,7 @@ For automatic layer name based on attributes value select an attribute from the 
 In addition you can select an attribute to add, for each polygon, in the attribute tables, so you can link the polygons to your points.
 You can also select a attribute to use as a distance. This attribute will be read as meters if isodistances or minutes if isochrones.
 
-![Qgis iso4app plugin](http://www.k-sol.it/iso4app/MassiveIsolineCalculation.png)
+![Qgis iso4app plugin](http://www.k-sol.it/iso4app/MassiveIsolineCalculationNew.png)
 
 An example of attribute table created for the new layer:
 
