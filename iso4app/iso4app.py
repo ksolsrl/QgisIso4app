@@ -499,7 +499,7 @@ class MainPlugin(object):
       attributeValuesNotNumeric=attributeValuesNotNumeric+1
     if attributeValuesNotNumeric>0:
      self.massiveDlg.labelCriticalMsg.setText('Warning: you have choosed a value of an attribute as an isoline distance, however non numeric values are present, this points will be skipped on massive isoline calculation')
-    self.massiveDlg.labelIsolineDescription.setText(self.isoDescr+ '  --> WARNING: DEFAUT DISTANCE WILL BE OVEWRITTEN BY THE ATTRIBUTE VALUE NAMED: '+ self.massiveDlg.comboBoxAttributeAsDistance.currentText())
+    self.massiveDlg.labelIsolineDescription.setText(self.isoDescr+ '  --> WARNING: DEFAUT DISTANCE WILL BE OVERWRITTEN BY THE ATTRIBUTE VALUE NAMED: '+ self.massiveDlg.comboBoxAttributeAsDistance.currentText())
   
  def eventCbBoxAttributes(self):
   suggestedLayerName=''

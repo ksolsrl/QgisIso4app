@@ -52,9 +52,9 @@
   <widget class="QLineEdit" name="lineEditLayerName">
    <property name="geometry">
     <rect>
-     <x>170</x>
+     <x>190</x>
      <y>320</y>
-     <width>471</width>
+     <width>451</width>
      <height>21</height>
     </rect>
    </property>
