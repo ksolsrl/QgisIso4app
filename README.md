@@ -9,6 +9,7 @@ Customizable buffering level.
 ![Qgis iso4app plugin](http://www.iso4app.com/images/qgis_plugin_example.png)
 
 ![Qgis iso4app parameters](http://www.iso4app.com/images/qgis_plugin_parameters.png)
+The combo-box for time/distance are now editable so you can write your preferred time/distances manually Ex. 332 meters. Please write using the correct format. 
 
 New massive isolines calculation feature is now available.
 
