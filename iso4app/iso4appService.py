@@ -99,6 +99,7 @@ class iso4CallService:
   checkBoxAvoidTolls=self.dlg.checkBoxAvoidTolls.isChecked()
   checkBoxRestrictedArea=self.dlg.checkBoxRestrictedArea.isChecked()
   checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()
+  checkBoxFastestRoute=self.dlg.checkBoxFastestRoute.isChecked()
 
   restUrl='http://www.iso4app.net/rest/1.3/isoline.json?licKey='+aiKey
   if rbIsochrone==True:
@@ -150,6 +151,8 @@ class iso4CallService:
    
   restUrl=restUrl+'&speedType='+speedType
 
+  if checkBoxFastestRoute:
+   restUrl=restUrl+'&fastestRouting=true'
   if checkBoxReduceQueueTime:
    restUrl=restUrl+'&reduceQueue=true'
   if checkBoxAvoidTolls:

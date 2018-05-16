@@ -383,11 +383,14 @@ class MainPlugin(object):
   idx=self.dlg.comboTravelType.currentIndex()
   self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(False)
   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(False)
+  self.dlg.checkBoxFastestRoute.setEnabled(True)
   if idx==1:
    self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(True)
    self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
   if idx==2:
    self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
   manageSpeed(self)
 
  def calculate_massive_isolines(self):
