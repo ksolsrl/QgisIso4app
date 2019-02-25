@@ -1,25 +1,399 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Maurizio Moscati</author>
  <class>iso4appDialogBase</class>
  <widget class="QDialog" name="iso4appDialogBase">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>517</width>
-    <height>605</height>
+    <width>491</width>
+    <height>562</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Iso4app parameters</string>
   </property>
-  <widget class="QDialogButtonBox" name="button_box">
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>560</y>
-     <width>80</width>
-     <height>40</height>
+     <x>10</x>
+     <y>120</y>
+     <width>471</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
+   </property>
+   <property name="title">
+    <string>Common parameters</string>
+   </property>
+   <widget class="QComboBox" name="comboTravelType">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>30</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>select the travel type</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>33</y>
+      <width>151</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
+    <property name="text">
+     <string>Travel type</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>62</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Start point approx.</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboApprox">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>60</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxAvoidTolls">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>32</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
+    <property name="text">
+     <string>Avoid tolls</string>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxRestrictedArea">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>62</y>
+      <width>161</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+     </font>
+    </property>
+    <property name="text">
+     <string>Restricted areas</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>400</y>
+     <width>471</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
+   </property>
+   <property name="title">
+    <string>Curve attribute</string>
+   </property>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>32</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Concavity</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboConcavity">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>30</y>
+      <width>71</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>32</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Buffering</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBuffering">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>30</y>
+      <width>61</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxIsochroneParams">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>220</y>
+     <width>471</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
+   </property>
+   <property name="title">
+    <string>Isochrone parameters</string>
+   </property>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>32</y>
+      <width>121</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Speed type</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboSpeedType">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>30</y>
+      <width>131</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>62</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Speed limit (kmh)</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineSpeed">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>60</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QCheckBox" name="checkBoxReduceQueueTime">
+    <property name="geometry">
+     <rect>
+      <x>300</x>
+      <y>31</y>
+      <width>171</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Reduce queue time</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="labelInfo">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>60</y>
+      <width>261</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(255, 85, 0);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+    </property>
+    <property name="wordWrap">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QLabel" name="labelInfo_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>506</y>
+     <width>451</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
@@ -28,21 +402,52 @@
      <pointsize>7</pointsize>
     </font>
    </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+   <property name="lineWidth">
+    <number>1</number>
    </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Ok</set>
+   <property name="text">
+    <string>Set parameters -&gt; click OK -&gt; click on a road on the map.</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBoxLogging">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>530</y>
+     <width>151</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>7</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Verbose logging</string>
    </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
-     <width>481</width>
-     <height>81</height>
+     <width>471</width>
+     <height>101</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
    <property name="palette">
     <palette>
@@ -462,11 +867,20 @@
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>7</pointsize>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
    </property>
    <property name="title">
     <string>Isoline Type</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
    </property>
    <widget class="QRadioButton" name="radioButtonIsochrone">
     <property name="enabled">
@@ -475,15 +889,18 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>151</width>
-      <height>17</height>
+      <y>40</y>
+      <width>221</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Arial</family>
-      <pointsize>7</pointsize>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -493,38 +910,13 @@
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButtonIsodistance">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>20</y>
-      <width>151</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>7</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>ISODISTANCE</string>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-   </widget>
    <widget class="QComboBox" name="comboSeconds">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
-      <width>171</width>
-      <height>22</height>
+      <y>70</y>
+      <width>232</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="editable">
@@ -537,340 +929,103 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>50</y>
-      <width>171</width>
-      <height>22</height>
+      <x>250</x>
+      <y>70</y>
+      <width>191</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="editable">
      <bool>true</bool>
     </property>
    </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>100</y>
-     <width>481</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="title">
-    <string>Common parameters</string>
-   </property>
-   <widget class="QComboBox" name="comboTravelType">
+   <widget class="QRadioButton" name="radioButtonIsodistance">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>20</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>select the travel type</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>26</y>
-      <width>161</width>
-      <height>20</height>
+      <x>250</x>
+      <y>40</y>
+      <width>191</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
      <font>
       <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
-     <string>Travel type</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>161</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-      <pointsize>7</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Start point approximation</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboApprox">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>50</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBoxAvoidTolls">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>20</y>
-      <width>111</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-    <property name="text">
-     <string>Avoid tolls</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBoxRestrictedArea">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>50</y>
-      <width>151</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-    <property name="text">
-     <string>Restricted areas</string>
+     <string>ISODISTANCE</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_4">
+  <widget class="QGroupBox" name="groupBoxIsodistanceParams">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>430</y>
-     <width>481</width>
-     <height>51</height>
+     <x>10</x>
+     <y>320</y>
+     <width>171</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>7</pointsize>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
    </property>
-   <property name="title">
-    <string>Curve attribute</string>
-   </property>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>23</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Concavity</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboConcavity">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>20</y>
-      <width>71</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>22</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Buffering</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboBuffering">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>20</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBoxIsochroneParams">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>200</y>
-     <width>481</width>
-     <height>81</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>7</pointsize>
-    </font>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
    </property>
    <property name="title">
-    <string>Isochrone parameters</string>
+    <string>Isodistance parameters</string>
    </property>
-   <widget class="QLabel" name="label_5">
+   <widget class="QCheckBox" name="checkBoxFastestRoute">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>121</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-    <property name="text">
-     <string>Speed type</string>
-    </property>
-   </widget>
-   <widget class="QComboBox" name="comboSpeedType">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>20</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>141</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-    <property name="text">
-     <string>Speed limit (kmh)</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="lineSpeed">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>50</y>
-      <width>41</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="checkBoxReduceQueueTime">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>20</y>
-      <width>171</width>
+      <y>30</y>
+      <width>151</width>
       <height>17</height>
      </rect>
     </property>
-    <property name="font">
-     <font>
-      <family>Arial</family>
-     </font>
-    </property>
     <property name="text">
-     <string>Reduce queue time</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelInfo">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-      <y>50</y>
-      <width>241</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>7</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-    </property>
-    <property name="wordWrap">
-     <bool>true</bool>
+     <string>Fastest Route</string>
     </property>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_6">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>350</y>
-     <width>481</width>
+     <x>190</x>
+     <y>320</y>
+     <width>291</width>
      <height>70</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Arial</family>
-     <pointsize>7</pointsize>
+     <pointsize>8</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 8pt &quot;Arial&quot;;</string>
    </property>
    <property name="title">
     <string>Specific pedestrian and bike parameters</string>
@@ -882,13 +1037,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>301</width>
+      <y>30</y>
+      <width>261</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Allow bicycles on pedestrian areas</string>
+     <string>Bicycles on pedestrian areas</string>
     </property>
     <property name="checked">
      <bool>true</bool>
@@ -901,295 +1056,128 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
-      <width>361</width>
+      <y>50</y>
+      <width>271</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
-     <string>Allow pedestrian and bicycles on trunk</string>
+     <string>Pedestrian and bicycles on trunk</string>
     </property>
     <property name="checked">
      <bool>true</bool>
     </property>
    </widget>
   </widget>
-  <widget class="QLabel" name="labelInfo_2">
+  <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>540</y>
-     <width>351</width>
-     <height>21</height>
+     <x>10</x>
+     <y>478</y>
+     <width>61</width>
+     <height>16</height>
     </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="lineWidth">
-    <number>1</number>
    </property>
    <property name="text">
-    <string>Set parameters, click OK. Click on a road on the map.</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>490</y>
-     <width>481</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>7</pointsize>
-    </font>
-   </property>
-   <property name="title">
     <string>API KEY</string>
    </property>
-   <widget class="QLineEdit" name="lineApiKey">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>441</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>7</pointsize>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string>Set a valid API-Key</string>
-    </property>
-   </widget>
   </widget>
-  <widget class="QCheckBox" name="checkBoxLogging">
+  <widget class="QLineEdit" name="lineApiKey">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>570</y>
-     <width>61</width>
+     <x>80</x>
+     <y>476</y>
+     <width>401</width>
      <height>20</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>Arial</family>
      <pointsize>7</pointsize>
     </font>
    </property>
-   <property name="text">
-    <string>Log</string>
+   <property name="toolTip">
+    <string>Set a valid API-Key</string>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBoxIsodistanceParams">
+  <widget class="QPushButton" name="button_box">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>290</y>
-     <width>481</width>
-     <height>51</height>
+     <x>210</x>
+     <y>530</y>
+     <width>71</width>
+     <height>21</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Arial</family>
-     <pointsize>7</pointsize>
-    </font>
+   <property name="text">
+    <string>OK</string>
    </property>
-   <property name="title">
-    <string>Isodistance parameters</string>
-   </property>
-   <widget class="QCheckBox" name="checkBoxFastestRoute">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>361</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Fastest Route</string>
-    </property>
-   </widget>
   </widget>
  </widget>
+ <layoutdefault spacing="4" margin="6"/>
  <resources/>
  <connections>
   <connection>
-   <sender>button_box</sender>
-   <signal>accepted()</signal>
-   <receiver>iso4appDialogBase</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>button_box</sender>
-   <signal>rejected()</signal>
-   <receiver>iso4appDialogBase</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButtonIsochrone</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBoxIsochroneParams</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>85</x>
-     <y>38</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>180</x>
-     <y>395</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>radioButtonIsodistance</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBoxIsochroneParams</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>235</x>
-     <y>38</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>180</x>
-     <y>395</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButtonIsochrone</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>comboSeconds</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>85</x>
-     <y>35</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>89</x>
-     <y>60</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButtonIsochrone</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>comboMeters</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>85</x>
-     <y>35</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>260</x>
-     <y>60</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButtonIsodistance</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>comboSeconds</receiver>
-   <slot>setDisabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>255</x>
-     <y>35</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>89</x>
-     <y>60</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>radioButtonIsodistance</sender>
-   <signal>toggled(bool)</signal>
+   <signal>clicked(bool)</signal>
    <receiver>comboMeters</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>35</y>
+     <x>355</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>60</y>
+     <x>355</x>
+     <y>100</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>radioButtonIsochrone</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBoxIsodistanceParams</receiver>
+   <signal>clicked(bool)</signal>
+   <receiver>comboSeconds</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>130</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>135</x>
+     <y>100</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioButtonIsochrone</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>comboMeters</receiver>
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>105</x>
-     <y>38</y>
+     <x>130</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>315</y>
+     <x>355</x>
+     <y>100</y>
     </hint>
    </hints>
   </connection>
   <connection>
    <sender>radioButtonIsodistance</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>groupBoxIsodistanceParams</receiver>
-   <slot>setEnabled(bool)</slot>
+   <signal>clicked(bool)</signal>
+   <receiver>comboSeconds</receiver>
+   <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>395</x>
-     <y>38</y>
+     <x>355</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>315</y>
+     <x>135</x>
+     <y>100</y>
     </hint>
    </hints>
   </connection>

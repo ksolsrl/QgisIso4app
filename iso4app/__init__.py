@@ -21,6 +21,7 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
+from __future__ import absolute_import
 
 def name():
     return "Iso4app isochrone/isodistance plugin"
@@ -52,5 +53,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     :type iface: QgsInterface
     """
     #
-    from iso4app import MainPlugin
+    from .iso4app import MainPlugin
     return MainPlugin(iface)

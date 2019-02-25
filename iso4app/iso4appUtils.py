@@ -22,17 +22,22 @@
 # MA 02110-1335 USA.
 #
 #******************************************************************************
+from __future__ import absolute_import
+from builtins import str
 import os
 import sys
 import tempfile
 import gettext
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 import json
 import requests
-from iso4appService import iso4CallService
+from PyQt5.QtWidgets import QAction,QApplication
+from .iso4appService import iso4CallService
+
+
 
 
 class iaAction(QAction):
@@ -43,7 +48,7 @@ class iaAction(QAction):
   self.canvas=iface.mapCanvas()
   self.setWhatsThis(self.desc())
   self.setToolTip(self.desc())
-  QObject.connect(self,SIGNAL("triggered()"),self.doit)
+  self.triggered.connect(self.doit)
   return None
  def doit(self):
   self.tool=iaTool(self.iface,self.dlg)
@@ -59,21 +64,23 @@ class iaTool(QgsMapTool):
   return None
 
  def canvasReleaseEvent(self,e):
-  QgsMessageLog.logMessage('canvasReleaseEvent start', 'iso4app')
-  point = self.canvas.getCoordinateTransform().toMapPoint(e.pos().x(),e.pos().y())
-  epsgCodeInput=self.canvas.mapRenderer().destinationCrs().authid()
-  epsgCodeCanvas=self.canvas.mapRenderer().destinationCrs().authid()
+  QgsMessageLog.logMessage('canvasReleaseEvent dopo getCoordinateTransform', 'iso4app')
+  point=self.canvas.getCoordinateTransform().toMapPoint(e.pos.x(),e.pos().y())
+  epsgCodeInput=self.canvas.mapSettings().destinationCrs().authid()
+  epsgCodeCanvas=self.canvas.mapSettings().destinationCrs().authid()
   layernamePoly='tmp polygn layer'
   layernamePin='tmp point layer'
   vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
   vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
   QApplication.setOverrideCursor(Qt.WaitCursor)
   try:
+   QgsMessageLog.logMessage('canvasReleaseEvent EPSG INPUT:'+epsgCodeInput, 'iso4app')
+   QgsMessageLog.logMessage('canvasReleaseEvent EPSG CANVAS:'+epsgCodeCanvas, 'iso4app')
    instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,point,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','',None)
    vlyrPoly.setName(instancei4a.layernamePoly)
    vlyrPin.setName(instancei4a.layernamePin)
-   vlyrPoly.setLayerTransparency(50)
-   QgsMapLayerRegistry.instance().addMapLayers([vlyrPin,vlyrPoly])  
+   vlyrPoly.setOpacity(0.5)
+   QgsProject.instance().addMapLayers([vlyrPin,vlyrPoly])  
   except Exception as inst:
    QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
    

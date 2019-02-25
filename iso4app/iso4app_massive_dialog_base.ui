@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>653</width>
-    <height>594</height>
+    <height>605</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -140,48 +140,6 @@
      <height>22</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBoxButtons">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>540</y>
-     <width>631</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string/>
-   </property>
-   <widget class="QPushButton" name="pushButtonClose">
-    <property name="geometry">
-     <rect>
-      <x>450</x>
-      <y>16</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Close Panel</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButtonCalculate">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>16</y>
-      <width>161</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Calculate Isolines</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QLineEdit" name="lineEditTotaPointError">
    <property name="geometry">
@@ -323,7 +281,7 @@ color: rgb(0, 0, 0);</string>
     <rect>
      <x>410</x>
      <y>240</y>
-     <width>171</width>
+     <width>221</width>
      <height>41</height>
     </rect>
    </property>
@@ -342,6 +300,32 @@ color: rgb(0, 0, 0);</string>
      <width>231</width>
      <height>20</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonCalculate">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>560</y>
+     <width>161</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Calculate Isolines</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButtonClose">
+   <property name="geometry">
+    <rect>
+     <x>460</x>
+     <y>560</y>
+     <width>161</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Close Panel</string>
    </property>
   </widget>
  </widget>

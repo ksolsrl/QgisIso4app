@@ -23,11 +23,14 @@
 
 import os
 
-from PyQt4 import QtGui, uic
+from qgis.PyQt import QtWidgets,QtGui, uic
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'iso4app_massive_dialog_base.ui'))
 
-class iso4appMassiveDialog(QtGui.QDialog, FORM_CLASS):
+class iso4appMassiveDialog(QtWidgets.QDialog, FORM_CLASS):
  def __init__(self, parent=None):
   super(iso4appMassiveDialog, self).__init__(parent)
   self.setupUi(self)
+
+ def closeEvent(self, event):
+  self.pushButtonClose.click()

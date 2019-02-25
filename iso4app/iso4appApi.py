@@ -1,12 +1,13 @@
+from __future__ import absolute_import
 import os
 import sys
 import tempfile
 import gettext
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from qgis.core import *
 from qgis.gui import *
-from iso4appUtils import iaAction
+from .iso4appUtils import iaAction
 
 class isoline(iaAction):
  def __init__(self,iface,dlg):
