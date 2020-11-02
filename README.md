@@ -1,5 +1,6 @@
 # QgisIso4app
 Qgis plugin for iso4app service. Isochrone/Isodistance.
+This version is compatible with QGIS 3.X.
 The Iso4App API is a service based onto OSM data; it's purpose is to provide isolines (isodistances and isochrones) to be used 
 in geographic analysis.
 Support for walk, car, bike isolines. Predefined speed levels and customizable speed value.Flags to reduce queue time and avoid tolls.
