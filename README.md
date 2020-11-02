@@ -14,6 +14,9 @@ Customizable buffering level.
 New feature Output types: now you can shown the street network instead of polygon:
 ![Qgis iso4app street_network](http://www.k-sol.it/iso4app/qgis_street_network_new.png)
 
+New feature Demographics->Add populaton: if avaiable te population inside the isoline poligon will be added as attibute table:
+![Qgis iso4app population](http://www.k-sol.it/iso4app/qgis_populaion.png)
+
 New Isodistances with Fastest Route option. You can check this option for isodistances/motor vehicle. Without this option the shortest path will be calculated, all route will be taken. Checking this option the fastest route will be taken and the polygon will be smaller, this is because usually the fastest roads are longer than the other roads. We suggest to use this option for transport planning.
 
 The combo-box for time/distance are now editable so you can write your preferred time/distances manually Ex. 332 meters. Please write using the correct format. 
