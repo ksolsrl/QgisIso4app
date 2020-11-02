@@ -10,11 +10,11 @@
 name=iso4app
 qgisMinimumVersion=3.0.0
 description=iso4app isochrone/isodistance
-version=1.0
+version=1.1
 author=Maurizio Moscati K-SOL SRL
 email=info@k-sol.it
 
-about=The Iso4App API is a service of the K-SOL S.r.l. based onto OSM data; it's purpose is to provide isolines (isodistances and isochrones) to be used in geographic analysis. http://www.iso4app.com
+about=The Iso4App API is a service of the K-SOL S.r.l. based onto OSM data; it's purpose is to provide isolines (isodistances and isochrones) to be used in geographic analysis. Isolines can be shown as Polygon or Street Network. Population inside the polygon can be shown as attribute table. http://www.iso4app.com
 
 tracker=https://github.com/ksolsrl/QgisIso4app/issues
 repository=https://github.com/ksolsrl/QgisIso4app
@@ -23,10 +23,10 @@ repository=https://github.com/ksolsrl/QgisIso4app
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=New features: you can view street network instead of polygon. Population inside isoline avalilable as attribute table.
 
 # Tags are comma separated with spaces allowed
-tags=
+tags=isochrone,catchment area, street network, population
 
 homepage=http://www.iso4app.com/#qgis
 category=Plugins

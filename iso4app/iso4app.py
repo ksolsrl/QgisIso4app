@@ -21,6 +21,7 @@
  ***************************************************************************/
 """
 from __future__ import absolute_import
+from time import sleep
 from builtins import str
 from builtins import range
 from builtins import object
@@ -33,7 +34,7 @@ import datetime
 from time import sleep
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QAction,QMenu,QApplication,QTableWidget,QTableWidgetItem	
+from PyQt5.QtWidgets import QAction,QMenu,QApplication,QTableWidget,QTableWidgetItem,QProgressBar,QProgressDialog
 from qgis.core import *
 from qgis.utils import *
 from qgis.gui import *
@@ -55,6 +56,7 @@ class MainPlugin(object):
   self.isoTool = QgsMapToolEmitPoint(self.canvas)
   self.selectedLayer=None  
   self.isoDescr=''
+  self.stopRunning=0
   self.timeStampLastMassiveRunning=datetime.datetime.now() 
 
  def name(self):
@@ -86,10 +88,14 @@ class MainPlugin(object):
   self.massiveIsoline.triggered.connect(self.clickMassiveIsolines)
   
   self.dlg.radioButtonIsochrone.toggled.connect(self.eventRbIsocrone)
+  self.dlg.radioButtonIsodistance.toggled.connect(self.eventRbIsodistance)
   self.dlg.comboTravelType.currentIndexChanged.connect(self.eventCbTravelType)
   self.dlg.comboSpeedType.currentIndexChanged.connect(self.eventCbSpeedType)
   self.dlg.button_box.clicked.connect(self.eventOkButton)
-  
+  self.dlg.radioButtonPolygon.toggled.connect(self.eventRbPolygon)
+  self.dlg.radioButtonStreetNetwork.toggled.connect(self.eventRbStreetNetwork)
+  self.dlg.lnkAvailableCountries.clicked.connect(self.eventLnkAvailableCountries)
+    
   #MASSIVE
   self.massiveDlg.pushButtonClose.clicked.connect(self.eventButtonCloseMassive)
   self.massiveDlg.comboBoxLayers.currentIndexChanged.connect(self.eventCbBoxLayers)
@@ -97,6 +103,7 @@ class MainPlugin(object):
   self.massiveDlg.comboBoxAttributes.currentIndexChanged.connect(self.eventCbBoxAttributes)
   self.massiveDlg.pushButtonCalculate.pressed.connect(self.disableButtonGroup)
   self.massiveDlg.pushButtonCalculate.released.connect(self.calculate_massive_isolines)
+  
   #
   self.dlg.comboTravelType.addItem('Motor vehicle')
   self.dlg.comboTravelType.addItem('Bicycle')
@@ -167,7 +174,7 @@ class MainPlugin(object):
    apiKey='87B7FB96-83DA-4FBD-A312-7822B96BB143'
   self.dlg.lineApiKey.setText(apiKey)
   rbIsochrone=s.value("iso4app/rbIsochrone", True)
-  if rbIsochrone=='true':
+  if rbIsochrone:
    self.dlg.radioButtonIsochrone.setChecked(True)
    self.dlg.radioButtonIsodistance.setChecked(False)
    self.dlg.comboMeters.setEnabled(False)
@@ -177,7 +184,18 @@ class MainPlugin(object):
    self.dlg.radioButtonIsodistance.setChecked(True)
    self.dlg.comboMeters.setEnabled(True)
    self.dlg.comboSeconds.setEnabled(False)
-
+  
+  rbPolygon=s.value("iso4app/rbPolygon", True)
+  
+  if rbPolygon:
+   self.dlg.radioButtonPolygon.setChecked(True)
+   self.dlg.radioButtonStreetNetwork.setChecked(False)
+   self.dlg.chkPopulation.setEnabled(True)
+  else:
+   self.dlg.radioButtonStreetNetwork.setChecked(True)
+   self.dlg.radioButtonPolygon.setChecked(False)
+   self.dlg.chkPopulation.setEnabled(False)
+  
   
   comboMeters=s.value("iso4app/comboMeters", 104)
   comboSeconds=s.value("iso4app/comboSeconds", 9)
@@ -196,41 +214,62 @@ class MainPlugin(object):
   self.dlg.comboTravelType.setCurrentIndex(int(comboTravelType))
   
   checkBoxAllowBikeOnPedestrian=s.value("iso4app/checkBoxAllowBikeOnPedestrian", True)
-  if checkBoxAllowBikeOnPedestrian=='true':
+  if checkBoxAllowBikeOnPedestrian:
    self.dlg.checkBoxAllowBikeOnPedestrian.setChecked(True)
   else:
    self.dlg.checkBoxAllowBikeOnPedestrian.setChecked(False)
 
   checkBoxAllowPedBikeOnTrunk=s.value("iso4app/checkBoxAllowPedBikeOnTrunk", True)
-  if checkBoxAllowPedBikeOnTrunk=='true':
+  if checkBoxAllowPedBikeOnTrunk:
    self.dlg.checkBoxAllowPedBikeOnTrunk.setChecked(True)
   else:
    self.dlg.checkBoxAllowPedBikeOnTrunk.setChecked(False)
 
   checkBoxAvoidTolls=s.value("iso4app/checkBoxAvoidTolls", True)
-  if checkBoxAvoidTolls=='true':
+  if checkBoxAvoidTolls:
    self.dlg.checkBoxAvoidTolls.setChecked(True)
   else:
    self.dlg.checkBoxAvoidTolls.setChecked(False)
 
   checkBoxRestrictedArea=s.value("iso4app/checkBoxRestrictedArea", True)
-  if checkBoxRestrictedArea=='true':
+  if checkBoxRestrictedArea:
    self.dlg.checkBoxRestrictedArea.setChecked(True)
   else:
    self.dlg.checkBoxRestrictedArea.setChecked(False)
 
   checkBoxReduceQueueTime=s.value("iso4app/checkBoxReduceQueueTime", True)
-  if checkBoxReduceQueueTime=='true':
+  if checkBoxReduceQueueTime:
    self.dlg.checkBoxReduceQueueTime.setChecked(True)
   else:
    self.dlg.checkBoxReduceQueueTime.setChecked(False)
 
+  checkBoxFastestRoute=s.value("iso4app/checkBoxFastestRoute", False)
+  if checkBoxFastestRoute:
+   self.dlg.checkBoxFastestRoute.setChecked(True)
+  else:
+   self.dlg.checkBoxFastestRoute.setChecked(False)
+
+  checkPopulation=s.value("iso4app/chkPopulation", False)
+  if checkPopulation:
+   self.dlg.chkPopulation.setChecked(True)
+  else:
+   self.dlg.chkPopulation.setChecked(False)
+   
   checkBoxLogging=s.value("iso4app/checkBoxLogging", False)
-  if checkBoxLogging=='true':
+  if checkBoxLogging:
    self.dlg.checkBoxLogging.setChecked(True)
   else:
    self.dlg.checkBoxLogging.setChecked(False)
-
+  
+  if rbIsochrone:
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
+  else:
+   idx=self.dlg.comboTravelType.currentIndex()
+   if idx==0:
+    self.dlg.checkBoxFastestRoute.setEnabled(True)
+   else:
+    self.dlg.checkBoxFastestRoute.setEnabled(False)
+   
   if self.dlg.checkBoxLogging.isChecked():
    QgsMessageLog.logMessage('apiKey:'+apiKey, 'iso4app')
    QgsMessageLog.logMessage('rbIsochrone:'+str(self.dlg.radioButtonIsochrone.isChecked()), 'iso4app')
@@ -245,7 +284,12 @@ class MainPlugin(object):
    QgsMessageLog.logMessage('checkBoxAllowPedBikeOnTrunk:'+str(checkBoxAllowPedBikeOnTrunk), 'iso4app')
    QgsMessageLog.logMessage('checkBoxAvoidTolls:'+str(checkBoxAvoidTolls), 'iso4app')
    QgsMessageLog.logMessage('checkBoxRestrictedArea:'+str(checkBoxRestrictedArea), 'iso4app')
+   QgsMessageLog.logMessage('checkBoxFastestRoute:'+str(checkBoxFastestRoute), 'iso4app')
    QgsMessageLog.logMessage('checkBoxReduceQueueTime:'+str(checkBoxReduceQueueTime), 'iso4app')
+   QgsMessageLog.logMessage('chkPopulation:'+str(checkPopulation), 'iso4app')
+   QgsMessageLog.logMessage('rbStreetNetwork:'+str(self.dlg.radioButtonStreetNetwork.isChecked()), 'iso4app')
+   QgsMessageLog.logMessage('rbPolygon:'+str(self.dlg.radioButtonPolygon.isChecked()), 'iso4app')
+   
   
   QgsMessageLog.logMessage('initGui end', 'iso4app')  
   
@@ -262,7 +306,11 @@ class MainPlugin(object):
   
   layernamePoly='tmp polygn layer'
   layernamePin='tmp point layer'
-  vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+  if self.dlg.radioButtonStreetNetwork.isChecked()==True:
+   vlyrPoly = QgsVectorLayer("multilinestring?crs="+epsgCodeCanvas, layernamePoly, "memory")
+  if self.dlg.radioButtonPolygon.isChecked()==True:
+   vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+
   vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
   QApplication.setOverrideCursor(Qt.WaitCursor)
   instancei4a=None
@@ -271,6 +319,13 @@ class MainPlugin(object):
    vlyrPoly.setName(instancei4a.layernamePoly)
    vlyrPin.setName(instancei4a.layernamePin)
    vlyrPoly.setOpacity(0.5)
+   if self.dlg.radioButtonStreetNetwork.isChecked()==True:
+    renderer=vlyrPoly.renderer()
+    rendererPin=vlyrPin.renderer()
+    pinColor=rendererPin.symbol().color().name()
+    symbolTmp=QgsLineSymbol.createSimple({'name':'LINE SYMBOL','width':'1', 'color':pinColor})
+    renderer.setSymbol(symbolTmp)
+
    QgsProject.instance().addMapLayers([vlyrPin,vlyrPoly])  
   except Exception as inst:
    QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
@@ -287,6 +342,8 @@ class MainPlugin(object):
   #logica
   
   rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
+  rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
+  rbPolygon=self.dlg.radioButtonPolygon.isChecked()
   comboMeters=self.dlg.comboMeters.currentIndex()
   comboSeconds=self.dlg.comboMeters.currentIndex()
   comboApprox=self.dlg.comboApprox.currentIndex()
@@ -299,6 +356,8 @@ class MainPlugin(object):
   checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()  
   checkBoxAllowBikeOnPedestrian=self.dlg.checkBoxAllowBikeOnPedestrian.isChecked()
   checkBoxAllowPedBikeOnTrunk=self.dlg.checkBoxAllowPedBikeOnTrunk.isChecked()
+  checkBoxFastestRoute=self.dlg.checkBoxFastestRoute.isChecked()
+  checkBoxPopulation=self.dlg.chkPopulation.isChecked()
   speedLimit=self.dlg.lineSpeed.text()
   self.massiveDlg.labelCriticalMsg.setText('')
 
@@ -313,7 +372,8 @@ class MainPlugin(object):
    otherParam+=' Include Restricted Area: NO. '
   
   isoDescr=''
-  if rbIsochrone==True:
+  fastestRoutingText=''
+  if rbIsochrone:
    isoDescr+='ISOCHRONE'
    valueIsoline = self.dlg.comboSeconds.currentText()
    if comboSpeedType==0:
@@ -334,6 +394,13 @@ class MainPlugin(object):
    isoDescr+='ISODISTANCE'
    speedType=''
    valueIsoline = self.dlg.comboMeters.currentText()
+   if checkBoxFastestRoute:
+    fastestRoutingText=' Fastest Routing: YES. '
+   
+  if rbStreetNetwork:
+   isoDescr+='(StreetNetwork)'
+  else:
+   isoDescr+='(Polygon)'
    
   isoDescr+=' '+valueIsoline+'.'
   if comboTravelType==0:
@@ -359,12 +426,18 @@ class MainPlugin(object):
   otherParam+=' Buffering:'+repr(comboBuffering)+'. '
   
   isoDescr+=' Mobility:'+mobility+'.'
+  isoDescr+=fastestRoutingText
   
   approxValue=self.dlg.comboApprox.currentText()
   isoDescr+=' Start Point Appoximation:'+approxValue+'.'
   isoDescr+=speedType
   isoDescr+=otherParam
   
+  if checkBoxPopulation:
+   isoDescr+=' Population=YES '
+  else:
+   isoDescr+=' Population=NO '
+ 
   self.massiveDlg.labelIsolineDescription.setText(isoDescr)
   self.isoDescr=isoDescr
   
@@ -391,10 +464,26 @@ class MainPlugin(object):
   
  def eventCbSpeedType(self):
   manageSpeed(self)
-  
+
+ def eventRbPolygon(self):
+   self.dlg.comboConcavity.setEnabled(True)
+   self.dlg.comboBuffering.setEnabled(True)
+   self.dlg.chkPopulation.setEnabled(True)
+   
+ def eventRbStreetNetwork(self):
+   self.dlg.comboConcavity.setEnabled(False)
+   self.dlg.comboBuffering.setEnabled(False)
+   self.dlg.chkPopulation.setEnabled(False)
+ 
  def eventRbIsocrone(self):
   isChecked=self.dlg.radioButtonIsochrone.isChecked()
+  self.dlg.checkBoxFastestRoute.setEnabled(False)
   manageSpeed(self)
+
+ def eventRbIsodistance(self):
+  idx=self.dlg.comboTravelType.currentIndex()
+  if idx==0:
+   self.dlg.checkBoxFastestRoute.setEnabled(True)
 
  def eventCbTravelType(self):
   idx=self.dlg.comboTravelType.currentIndex()
@@ -408,9 +497,24 @@ class MainPlugin(object):
   if idx==2:
    self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
    self.dlg.checkBoxFastestRoute.setEnabled(False)
+  if self.dlg.radioButtonIsochrone.isChecked():
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
   manageSpeed(self)
 
+ def eventLnkAvailableCountries(self):
+  QDesktopServices.openUrl(QUrl('http://www.iso4app.com/thematicMap.jsp'))
+  
+ def calculate_massive_isolines_test(self):
+  rowCount=10
+  for row in range(0,rowCount):
+   progress=(float(row)/float(rowCount))
+   iface.statusBarIface().showMessage("Processed:"+str(row)+ ' of:'+str(rowCount))
+   sleep(1)
+   self.iface.mainWindow().repaint()
+
+
  def calculate_massive_isolines(self):
+  self.stopRunning=0
   timeStampNow=datetime.datetime.now()
   self.massiveDlg.labelCriticalMsg.setText('')
   lastTimeRunning=diffMillis(self.timeStampLastMassiveRunning,timeStampNow)
@@ -422,7 +526,11 @@ class MainPlugin(object):
      epsgCodeCanvas=self.canvas.mapSettings().destinationCrs().authid()
      layernamePoly=self.massiveDlg.lineEditLayerName.text()
      layernamePin='test pin'
-     vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+     if self.dlg.radioButtonStreetNetwork.isChecked()==True:
+      vlyrPoly = QgsVectorLayer("multilinestring?crs="+epsgCodeCanvas, layernamePoly, "memory")
+     if self.dlg.radioButtonPolygon.isChecked()==True:
+      vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
+
      vlyrPin = None
 
      #gestione attributi su feature
@@ -439,9 +547,11 @@ class MainPlugin(object):
      try:
       rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
       for row in range(0,rowCount):
+       if self.stopRunning==1: break
        coordWgsX = self.massiveDlg.tableWidgetPoints.item(row,1)
        coordWgsY = self.massiveDlg.tableWidgetPoints.item(row,2) 
        pointData=self.massiveDlg.tableWidgetPoints.item(row,4).data(0)
+       colorLayer=self.massiveDlg.tableWidgetPoints.item(row,5)
        if idxAttrbute4Layer>0:
         attributeValue4Layer = self.massiveDlg.tableWidgetPoints.item(row,idxAttrbute4Layer+4).text()
         QgsMessageLog.logMessage('calculate_massive_isolines selezionato attributo indice:'+repr(idxAttrbute4Layer)+' valore:'+attributeValue4Layer, 'iso4app')
@@ -475,18 +585,25 @@ class MainPlugin(object):
         self.massiveDlg.lineEditTotaPointOK.setText(repr(okIso))
         self.massiveDlg.lineEditTotaPointError.setText(repr(errIso))
         firstT = datetime.datetime.now() 
-        timeWait=0
-        while (timeWait<500):
-         currT = datetime.datetime.now()
-         timeWait=diffMillis(firstT,currT)
+        sleep(1)
+        iface.statusBarIface().showMessage("Processed:"+str(row+1)+ ' of:'+str(rowCount))
+        self.iface.mainWindow().repaint()
+       else:
+        self.iface.mainWindow().repaint()
       
+      iface.statusBarIface().clearMessage()
       if okIso>0:
        vlyrPoly.setOpacity(0.5)
+       if self.dlg.radioButtonStreetNetwork.isChecked()==True:
+        renderer=vlyrPoly.renderer()
+        symbolTmp=QgsLineSymbol.createSimple({'name':'LINE SYMBOL','width':'1', 'color':colorLayer.text()})
+        renderer.setSymbol(symbolTmp)
+
        QgsProject.instance().addMapLayers([vlyrPin,vlyrPoly])  
      except Exception as inst:
       QgsMessageLog.logMessage('Error:'+str(inst), 'iso4app')
  
-     QApplication.restoreOverrideCursor()   
+     QApplication.restoreOverrideCursor()
      self.canvas.refresh()
     else:
      self.iface.messageBar().pushMessage("Iso4App", 'Selected Layer has not any points!', level=2)
@@ -572,11 +689,11 @@ class MainPlugin(object):
     except Exception as ex:
      QgsMessageLog.logMessage(str(ex),'iso4app')
 
-    self.massiveDlg.tableWidgetPoints.setColumnCount(5+numAttr)
+    self.massiveDlg.tableWidgetPoints.setColumnCount(6+numAttr)
     self.massiveDlg.tableWidgetPoints.setColumnWidth(0,40)
     self.massiveDlg.tableWidgetPoints.setColumnWidth(3,50)
     self.massiveDlg.tableWidgetPoints.setColumnWidth(4,60)
-    self.massiveDlg.tableWidgetPoints.setHorizontalHeaderLabels(('FID;LNG;LAT;STATUS;RESERVED;'+attrNames).split(";"))
+    self.massiveDlg.tableWidgetPoints.setHorizontalHeaderLabels(('FID;LNG;LAT;STATUS;RESERVED;COLOR;'+attrNames).split(";"))
    
     if self.dlg.checkBoxLogging.isChecked():   
      QgsMessageLog.logMessage('Info Layer:'+repr(idx)+ ' '+selectedLayer.name()+' epsg:'+repr(epsgCodeInput), 'iso4app') 
@@ -585,6 +702,8 @@ class MainPlugin(object):
      idxRow=0
      newSuggestedLayerName='isoline_'
      QgsMessageLog.logMessage('before :', 'iso4app') 
+     loopNum=0
+     colorLayer="#93604e"
      for feature in iter:
       geom = feature.geometry()
       #geomTypeString=self.iface.QgsWKBTypes.displayString(int(geom.wkbType()))
@@ -592,6 +711,12 @@ class MainPlugin(object):
       QgsMessageLog.logMessage('geom.type()'+repr(geom.type()), 'iso4app')
       #if geom.type() == QGis.WKBPoint:
       if geom.type() == 0:
+       if loopNum==0:
+        rendererMassive=selectedLayer.renderer()
+        colorLayer=rendererMassive.symbol().color().name()
+        QgsMessageLog.logMessage('eventCbBoxLayers:'+colorLayer ,'iso4app') 
+
+       loopNum=loopNum+1
        pointOnLayer = geom.asPoint()
        pt = transformer.transform(pointOnLayer)
        QgsMessageLog.logMessage('point:'+str(pointOnLayer)+ ' '+str(pt), 'iso4app') 
@@ -601,14 +726,18 @@ class MainPlugin(object):
        itemStatus = QTableWidgetItem(' ')
        itemQgisPoint = QTableWidgetItem(str(feature.id())) 
        itemQgisPoint.setData(0,geom.asPoint())
+       itemQgisLayerColor = QTableWidgetItem(str(colorLayer))
+       QgsMessageLog.logMessage('dopo itemQgisLayerColor' , 'iso4app') 
        self.massiveDlg.tableWidgetPoints.insertRow(idxRow)
        self.massiveDlg.tableWidgetPoints.setItem(idxRow,0,itemId)
        self.massiveDlg.tableWidgetPoints.setItem(idxRow,1,itemPointX)
        self.massiveDlg.tableWidgetPoints.setItem(idxRow,2,itemPointY) 
        self.massiveDlg.tableWidgetPoints.setItem(idxRow,3,itemStatus)
        self.massiveDlg.tableWidgetPoints.setItem(idxRow,4,itemQgisPoint) 
+       self.massiveDlg.tableWidgetPoints.setItem(idxRow,5,itemQgisLayerColor) 
+       QgsMessageLog.logMessage('dopo tableWidgetPoints itemQgisLayerColor' , 'iso4app')
        if numAttr>0:
-        prgTable=5 
+        prgTable=6 
         valueAttr=''
         for field in selectedLayer.fields(): 
          if type(feature[field.name()])==int:
@@ -623,6 +752,7 @@ class MainPlugin(object):
           valueAttr=feature[field.name()]
          if type(feature[field.name()])==str:
           valueAttr=feature[field.name()]
+         #QgsMessageLog.logMessage('type feature:'+type(feature[field.name()]) , 'iso4app') 
          self.massiveDlg.tableWidgetPoints.setItem(idxRow,prgTable,QTableWidgetItem(valueAttr))
          prgTable=prgTable+1
         
@@ -664,6 +794,10 @@ class MainPlugin(object):
   s.setValue("iso4app/checkBoxRestrictedArea", self.dlg.checkBoxRestrictedArea.isChecked())
   s.setValue("iso4app/checkBoxReduceQueueTime", self.dlg.checkBoxReduceQueueTime.isChecked())
   s.setValue("iso4app/checkBoxLogging", self.dlg.checkBoxLogging.isChecked())
+  s.setValue("iso4app/checkBoxFastestRoute", self.dlg.checkBoxFastestRoute.isChecked())
+  s.setValue("iso4app/rbPolygon", self.dlg.radioButtonPolygon.isChecked())
+  s.setValue("iso4app/chkPopulation", self.dlg.chkPopulation.isChecked())
+  s.setValue("iso4app/rbStreetNetwork", self.dlg.radioButtonStreetNetwork.isChecked())
   self.dlg.close()
   self.canvas.setMapTool(self.isoTool)
   
@@ -689,6 +823,9 @@ def manageSpeed(self):
  self.dlg.labelInfo.setText('')
  self.dlg.lineSpeed.setText('')
  if isChecked==1:
+  self.dlg.comboSpeedType.setEnabled(True)
+  self.dlg.checkBoxReduceQueueTime.setEnabled(True)
+  self.dlg.lineSpeed.setEnabled(True)
   if idxTT==1:
    if idxST==0:
     self.dlg.lineSpeed.setText('8')
@@ -709,5 +846,22 @@ def manageSpeed(self):
    if idxST==3:
     self.dlg.lineSpeed.setText('20')
     self.dlg.labelInfo.setText('High default speed value! Please adjust it')
+ else:
+  self.dlg.comboSpeedType.setEnabled(False)
+  self.dlg.checkBoxReduceQueueTime.setEnabled(False)
+  self.dlg.lineSpeed.setEnabled(False)
+  
  return None
+def progdialog(progress):
+ dialog = QProgressDialog()
+ dialog.setWindowTitle("Progress")
+ dialog.setLabelText("text")
+ bar = QProgressBar(dialog)
+ bar.setTextVisible(True)
+ bar.setValue(progress)
+ dialog.setBar(bar)
+ dialog.setMinimumWidth(300)
+ dialog.show()
+ return dialog, bar
+
  

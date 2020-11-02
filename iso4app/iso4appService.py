@@ -52,6 +52,7 @@ class iso4CallService(object):
   self.layernamePoly=''
   self.layernamePin=''
   self.overWrittenDistance=overWrittenDistance
+  #aggiungere i parametri per lo street network TODO, poi gestire la chiamata con parametro visualizationType=street_network_no_range e gestire output
   self.callIsoline()
   return None
  def __str__(self):
@@ -86,6 +87,8 @@ class iso4CallService(object):
   aiKey=self.dlg.lineApiKey.text()
   speedLimit=self.dlg.lineSpeed.text()
   rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
+  rbPolygon=self.dlg.radioButtonPolygon.isChecked()
+  rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
   comboMeters=self.dlg.comboMeters.currentIndex()
   comboSeconds=self.dlg.comboMeters.currentIndex()
   comboApprox=self.dlg.comboApprox.currentIndex()
@@ -100,7 +103,9 @@ class iso4CallService(object):
   checkBoxRestrictedArea=self.dlg.checkBoxRestrictedArea.isChecked()
   checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()
   checkBoxFastestRoute=self.dlg.checkBoxFastestRoute.isChecked()
+  checkBoxPopulation=self.dlg.chkPopulation.isChecked()
 
+  visualizationType=""
   restUrl='http://www.iso4app.net/rest/1.3/isoline.json?licKey='+aiKey
   if rbIsochrone==True:
    restUrl=restUrl+'&type=isochrone'
@@ -170,6 +175,14 @@ class iso4CallService(object):
   restUrl=restUrl+'&concavity='+repr(comboConcavity)
   restUrl=restUrl+'&caller=Qgis'
   
+  if rbPolygon:
+   restUrl=restUrl+'&visualizationType=polygon'
+   if checkBoxPopulation:
+    restUrl=restUrl+'&addPopIfAvailable=true'
+  if rbStreetNetwork==True:
+   restUrl=restUrl+'&visualizationType=street_network_no_range'
+  
+  
   if self.dlg.checkBoxLogging.isChecked():
    QgsMessageLog.logMessage('callIsoline restUrl:'+restUrl, 'iso4app')
   
@@ -179,10 +192,19 @@ class iso4CallService(object):
     QgsMessageLog.logMessage('callIsoline response.text:'+response.text, 'iso4app')
 
    root = json.loads(response.text);
-   coordinates=root['polygons'][0]['exterior']
+
    wayName=root['startPoint']['way']
    startPoint=root['startPoint']['coordinates']
    startPointApprox=root['startPoint']['approximation']
+   
+   #{"exterior":[[12.4742976,41.9861831],[12.4769622,41.9865956],
+   if rbPolygon==True:
+    coordinates=root['polygons'][0]['exterior']
+   
+   #nel caso di street network senza range prendo solo il primo range che contiene parts che è un array di edges
+   #"streetNetwork":{"ranges":[{"info":"1 600","color":"#404040","parts":[{"edges":[[12.512538,41.9498362],[12.5115384,41.9492004],[12.51159,41.949029]]},{"edges":[[12.5146503
+   if rbStreetNetwork==True:
+    coordinates=root['streetNetwork']['ranges'][0]['parts']
    
    
    aQgsPoint=QgsPoint(float(startPoint.split(' ')[1]),float(startPoint.split(' ')[0]))
@@ -201,24 +223,59 @@ class iso4CallService(object):
    currentCoordSystemOutputCanvas=QgsCoordinateReferenceSystem(self.epsgCodeCanvas)
    transformerReverse = QgsCoordinateTransform(gpsCoordSystemIso4App,currentCoordSystemOutputCanvas,QgsProject.instance())
    
-   points =[]
-   for isoCoord in coordinates:
-    pointA=QgsPoint(isoCoord[0],isoCoord[1])
-    ptReverse = transformerReverse.transform(isoCoord[0],isoCoord[1])
-    ptReverseXY=QgsPointXY(ptReverse)
-    points.append(ptReverseXY)
-    
    aQgsPointReverse = transformerReverse.transform(float(startPoint.split(' ')[1]),float(startPoint.split(' ')[0]))
-   
-   polygon = QgsGeometry.fromPolygonXY([points]) 
    polyB = QgsFeature()
-   polyB.setGeometry(polygon)	
+
+   
+   popValue=''   
+   if rbPolygon==True:
+    visualizationType="(Polygon)"
+    points =[]
+    for isoCoord in coordinates:
+     pointA=QgsPoint(isoCoord[0],isoCoord[1])
+     ptReverse = transformerReverse.transform(isoCoord[0],isoCoord[1])
+     ptReverseXY=QgsPointXY(ptReverse)
+     points.append(ptReverseXY)
+
+    polygon = QgsGeometry.fromPolygonXY([points])
+    polyB.setGeometry(polygon)
+    #nel ramo polygon verifico anche se è stata chiesta la popolazione
+    if checkBoxPopulation:
+     if root['indicator'] is not None:
+      popValue=int(root['indicator']['v'])
+     QgsMessageLog.logMessage('callIsoline indicator pop:'+repr(popValue), 'iso4app')
+   #finito ramo Polygon
+   
+   if rbStreetNetwork==True:
+    visualizationType="(Street Network)"
+    streets =[]
+    for edges in coordinates:
+     points =[]
+     
+     if self.dlg.checkBoxLogging.isChecked():
+      #{'edges': [[12.512538, 41.9498362], [12.5125736, 41.9498313],
+      QgsMessageLog.logMessage('callIsoline rbStreetNetwork:'+repr(edges), 'iso4app')
+
+     edgesCoordinates=edges['edges']
+     for isoCoord in edgesCoordinates:
+      if self.dlg.checkBoxLogging.isChecked():
+       QgsMessageLog.logMessage('callIsoline isoCoord:'+repr(isoCoord), 'iso4app')
+      pointA=QgsPoint(isoCoord[0],isoCoord[1])
+      ptReverse = transformerReverse.transform(isoCoord[0],isoCoord[1])
+      ptReverseXY=QgsPointXY(ptReverse)
+      points.append(ptReverseXY)
+     QgsMessageLog.logMessage('callIsoline prima di QgsLineString:', 'iso4app')
+     streets.append(points)
+    
+    streetsGeom= QgsGeometry.fromMultiPolylineXY(streets)
+    polyB.setGeometry(streetsGeom)
+   #finito ramo street network
    
    #creazione layer virtual
    if wayName=='':
     wayName='way unknow'
    
-   self.layernamePoly=isoType+': ' +repr(distance)+' '+unit+'. Coord: '+startPoint
+   self.layernamePoly=isoType+visualizationType+': ' +repr(distance)+' '+unit+'. Coord: '+startPoint
    self.layernamePin='PIN: '+' Coord: '+startPoint+' ('+wayName+')'
 
    try:
@@ -247,7 +304,8 @@ class iso4CallService(object):
    #controllo aggiunta attributi del layer origine nel caso massivo
    if self.attributeName4Layer!='':
     dprovPoly.addAttributes([ QgsField(self.attributeName4Layer, QVariant.String)])
-   
+   dprovPoly.addAttributes([ QgsField("VisualizationType", QVariant.String)])   
+   dprovPoly.addAttributes([ QgsField("Population", QVariant.String)])
      
     
    self.layerXPolygon.updateFields()
@@ -276,18 +334,24 @@ class iso4CallService(object):
     attrIsolineLng = 'IsolineStartPointLng'
     feature[attrIsolineLng] = 6
     dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : aQgsPoint.x()}})
-    attrIsolineLng = 'IsolineInputStartPointLat'
-    feature[attrIsolineLng] = 7
-    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : pt.y()}})
-    attrIsolineLng = 'IsolineInputStartPointLng'
-    feature[attrIsolineLng] = 8
-    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : pt.x()}})
-    attrIsolineLng = 'IsolineStartPointApproximation'
-    feature[attrIsolineLng] = 9
-    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsolineLng] : startPointApprox}})
+    attrIsoline = 'IsolineInputStartPointLat'
+    feature[attrIsoline] = 7
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsoline] : pt.y()}})
+    attrIsoline = 'IsolineInputStartPointLng'
+    feature[attrIsoline] = 8
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsoline] : pt.x()}})
+    attrIsoline = 'IsolineStartPointApproximation'
+    feature[attrIsoline] = 9
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsoline] : startPointApprox}})
     if self.attributeName4Layer!='':
      feature[self.attributeName4Layer] = 10
      dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[self.attributeName4Layer] : self.attributeValue4Layer}})
+    attrIsoline = 'VisualizationType'
+    feature[attrIsoline] = 11
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsoline] : visualizationType}})
+    attrIsoline = 'Population'
+    feature[attrIsoline] = 12
+    dprovPoly.changeAttributeValues({lastFeature.id() : {dprovPoly.fieldNameMap()[attrIsoline] : popValue}})
          
 
    self.layerXPolygon.commitChanges() 

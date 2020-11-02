@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
-    <height>562</height>
+    <width>662</width>
+    <height>578</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -34,7 +34,7 @@
     <rect>
      <x>10</x>
      <y>120</y>
-     <width>471</width>
+     <width>641</width>
      <height>91</height>
     </rect>
    </property>
@@ -78,6 +78,10 @@
     <property name="font">
      <font>
       <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -128,6 +132,10 @@
     <property name="font">
      <font>
       <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -146,6 +154,10 @@
     <property name="font">
      <font>
       <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
     <property name="text">
@@ -160,9 +172,9 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>400</y>
-     <width>471</width>
-     <height>61</height>
+     <y>390</y>
+     <width>171</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="font">
@@ -178,52 +190,62 @@
     <string notr="true">font: 8pt &quot;Arial&quot;;</string>
    </property>
    <property name="title">
-    <string>Curve attribute</string>
+    <string>Output types</string>
    </property>
-   <widget class="QLabel" name="label_3">
+   <widget class="QRadioButton" name="radioButtonPolygon">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>32</y>
-      <width>71</width>
-      <height>16</height>
+      <x>10</x>
+      <y>25</y>
+      <width>121</width>
+      <height>21</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="text">
-     <string>Concavity</string>
+     <string>Polygon</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
-   <widget class="QComboBox" name="comboConcavity">
+   <widget class="QRadioButton" name="radioButtonStreetNetwork">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>30</y>
-      <width>71</width>
-      <height>22</height>
+      <x>10</x>
+      <y>55</y>
+      <width>151</width>
+      <height>21</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>32</y>
-      <width>71</width>
-      <height>16</height>
-     </rect>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>8</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
     </property>
     <property name="text">
-     <string>Buffering</string>
+     <string>Street Network</string>
     </property>
-   </widget>
-   <widget class="QComboBox" name="comboBuffering">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>30</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
+    <property name="checked">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>
@@ -232,7 +254,7 @@
     <rect>
      <x>10</x>
      <y>220</y>
-     <width>471</width>
+     <width>641</width>
      <height>91</height>
     </rect>
    </property>
@@ -274,6 +296,9 @@
     </property>
    </widget>
    <widget class="QComboBox" name="comboSpeedType">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -295,8 +320,8 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>62</y>
+      <x>450</x>
+      <y>32</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -317,8 +342,8 @@
    <widget class="QLineEdit" name="lineSpeed">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>60</y>
+      <x>590</x>
+      <y>30</y>
       <width>41</width>
       <height>20</height>
      </rect>
@@ -358,7 +383,7 @@
    <widget class="QLabel" name="labelInfo">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>370</x>
       <y>60</y>
       <width>261</width>
       <height>21</height>
@@ -390,8 +415,8 @@
   <widget class="QLabel" name="labelInfo_2">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>506</y>
+     <x>10</x>
+     <y>516</y>
      <width>451</width>
      <height>21</height>
     </rect>
@@ -418,8 +443,8 @@
   <widget class="QCheckBox" name="checkBoxLogging">
    <property name="geometry">
     <rect>
-     <x>330</x>
-     <y>530</y>
+     <x>460</x>
+     <y>496</y>
      <width>151</width>
      <height>20</height>
     </rect>
@@ -439,7 +464,7 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>471</width>
+     <width>641</width>
      <height>101</height>
     </rect>
    </property>
@@ -889,7 +914,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>30</y>
       <width>221</width>
       <height>21</height>
      </rect>
@@ -914,7 +939,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>70</y>
+      <y>60</y>
       <width>232</width>
       <height>21</height>
      </rect>
@@ -929,8 +954,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>70</y>
+      <x>430</x>
+      <y>60</y>
       <width>191</width>
       <height>21</height>
      </rect>
@@ -945,8 +970,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>40</y>
+      <x>430</x>
+      <y>30</y>
       <width>191</width>
       <height>21</height>
      </rect>
@@ -974,7 +999,7 @@
      <x>10</x>
      <y>320</y>
      <width>171</width>
-     <height>71</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="font">
@@ -1011,8 +1036,8 @@
     <rect>
      <x>190</x>
      <y>320</y>
-     <width>291</width>
-     <height>70</height>
+     <width>461</width>
+     <height>61</height>
     </rect>
    </property>
    <property name="font">
@@ -1055,9 +1080,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>271</width>
+      <x>210</x>
+      <y>30</y>
+      <width>251</width>
       <height>17</height>
      </rect>
     </property>
@@ -1073,7 +1098,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>478</y>
+     <y>496</y>
      <width>61</width>
      <height>16</height>
     </rect>
@@ -1086,8 +1111,8 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>476</y>
-     <width>401</width>
+     <y>496</y>
+     <width>361</width>
      <height>20</height>
     </rect>
    </property>
@@ -1103,8 +1128,8 @@
   <widget class="QPushButton" name="button_box">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>530</y>
+     <x>320</x>
+     <y>546</y>
      <width>71</width>
      <height>21</height>
     </rect>
@@ -1112,6 +1137,119 @@
    <property name="text">
     <string>OK</string>
    </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>390</y>
+     <width>171</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Polygon attributes</string>
+   </property>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>55</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Buffering</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>25</y>
+      <width>71</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Concavity</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBuffering">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>55</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboConcavity">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>25</y>
+      <width>41</width>
+      <height>20</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>390</y>
+     <width>281</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Demographics</string>
+   </property>
+   <widget class="QCheckBox" name="chkPopulation">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>19</y>
+      <width>261</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add population as Attribute Table</string>
+    </property>
+   </widget>
+   <widget class="QCommandLinkButton" name="lnkAvailableCountries">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>46</y>
+      <width>231</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>41</height>
+     </size>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>7</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="text">
+     <string>See avaliable countries</string>
+    </property>
+   </widget>
   </widget>
  </widget>
  <layoutdefault spacing="4" margin="6"/>
