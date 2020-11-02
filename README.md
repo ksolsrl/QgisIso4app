@@ -39,3 +39,6 @@ You can also select a attribute to use as a distance. This attribute will be rea
 An example of attribute table created for the new layer:
 
 ![Qgis iso4app plugin](http://www.k-sol.it/iso4app/TableAttributes.png)
+
+
+WARNING: THE LAYERS CREATED BY THIS PLUGIN ARE MEMORY LAYERS IF YOU CLOSE QGIS THEY ARE NOT SAVED. IN ORDER TO SAVE ISO4APP LAYERS YOU CAN USE THE OPTION MAKE PERMANENT AVAILABLE ON RIGHT-CLICKING ON THE LAYER.
