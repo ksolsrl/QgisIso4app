@@ -42,3 +42,6 @@ An example of attribute table created for the new layer:
 
 
 WARNING: THE LAYERS CREATED BY THIS PLUGIN ARE MEMORY LAYERS IF YOU CLOSE QGIS THEY ARE NOT SAVED. IN ORDER TO SAVE ISO4APP LAYERS YOU CAN USE THE OPTION MAKE PERMANENT AVAILABLE ON RIGHT-CLICKING ON THE LAYER.
+
+WARNING: Bugs on version 1.1. Version 1.1 introduced an error on the massive isolines calculation. This error occurs when selecting an attribute using the como-boxes: "Add attribute to layer", "Isoline distance by attribute value" and "Layer name by attribute". Version 1.2 fixes this error.
+
