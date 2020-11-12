@@ -553,12 +553,12 @@ class MainPlugin(object):
        pointData=self.massiveDlg.tableWidgetPoints.item(row,4).data(0)
        colorLayer=self.massiveDlg.tableWidgetPoints.item(row,5)
        if idxAttrbute4Layer>0:
-        attributeValue4Layer = self.massiveDlg.tableWidgetPoints.item(row,idxAttrbute4Layer+4).text()
+        attributeValue4Layer = self.massiveDlg.tableWidgetPoints.item(row,idxAttrbute4Layer+5).text()
         QgsMessageLog.logMessage('calculate_massive_isolines selezionato attributo indice:'+repr(idxAttrbute4Layer)+' valore:'+attributeValue4Layer, 'iso4app')
        overWrittenDistance=None
        goCalculation=False
        if idxAttributeAsDistance>0:
-        valueDst=self.massiveDlg.tableWidgetPoints.item(row,idxAttributeAsDistance+4).text()
+        valueDst=self.massiveDlg.tableWidgetPoints.item(row,idxAttributeAsDistance+5).text()
         if valueDst.isdigit():
          QgsMessageLog.logMessage('calculate_massive_isolines valueDst:'+valueDst, 'iso4app')
          overWrittenDistance=int(valueDst)
@@ -629,7 +629,7 @@ class MainPlugin(object):
     attributeValuesNotNumeric=0
     attributeValuesNumeric=0
     for row in range(0,rowCount):
-     value = self.massiveDlg.tableWidgetPoints.item(row,idx+4)
+     value = self.massiveDlg.tableWidgetPoints.item(row,idx+5)
      if value.text().isdigit():
       attributeValuesNumeric=attributeValuesNumeric+1
      else:
@@ -645,7 +645,7 @@ class MainPlugin(object):
    if idx>0:
     rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
     for row in range(0,rowCount):
-     value = self.massiveDlg.tableWidgetPoints.item(row,idx+4)
+     value = self.massiveDlg.tableWidgetPoints.item(row,idx+5)
      if len(value.text())>0:
       suggestedLayerName+=value.text()+'_'
      if len(suggestedLayerName)>200:

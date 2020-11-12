@@ -10,7 +10,7 @@
 name=iso4app
 qgisMinimumVersion=3.0.0
 description=iso4app isochrone/isodistance
-version=1.1
+version=1.2
 author=Maurizio Moscati K-SOL SRL
 email=info@k-sol.it
 
@@ -23,7 +23,7 @@ repository=https://github.com/ksolsrl/QgisIso4app
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=New features: you can view street network instead of polygon. Population inside isoline avalilable as attribute table.
+changelog=Bug fixes. Previous version 1.1 introduced an error on the massive isolines calculation. This error occurs when selecting an attribute using the como-boxes: "Add attribute to layer", "Isoline distance by attribute value" and "Layer name by attribute". This version 1.2 fixes this error.
 
 # Tags are comma separated with spaces allowed
 tags=isochrone,catchment area, street network, population
