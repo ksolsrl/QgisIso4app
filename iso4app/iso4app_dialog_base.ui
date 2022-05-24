@@ -173,7 +173,7 @@
     <rect>
      <x>10</x>
      <y>390</y>
-     <width>171</width>
+     <width>161</width>
      <height>91</height>
     </rect>
    </property>
@@ -998,7 +998,7 @@
     <rect>
      <x>10</x>
      <y>320</y>
-     <width>171</width>
+     <width>161</width>
      <height>61</height>
     </rect>
    </property>
@@ -1034,9 +1034,9 @@
   <widget class="QGroupBox" name="groupBox_6">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>320</y>
-     <width>461</width>
+     <width>471</width>
      <height>61</height>
     </rect>
    </property>
@@ -1141,7 +1141,7 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>390</y>
      <width>171</width>
      <height>91</height>
@@ -1200,9 +1200,9 @@
   <widget class="QGroupBox" name="groupBox_5">
    <property name="geometry">
     <rect>
-     <x>370</x>
+     <x>360</x>
      <y>390</y>
-     <width>281</width>
+     <width>291</width>
      <height>91</height>
     </rect>
    </property>
@@ -1219,14 +1219,14 @@
      </rect>
     </property>
     <property name="text">
-     <string>Add population as Attribute Table</string>
+     <string>Add population as Attribute Table (+ credits!)</string>
     </property>
    </widget>
    <widget class="QCommandLinkButton" name="lnkAvailableCountries">
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>46</y>
+      <y>40</y>
       <width>231</width>
       <height>41</height>
      </rect>

@@ -250,11 +250,17 @@ class MainPlugin(object):
    self.dlg.checkBoxFastestRoute.setChecked(False)
 
   checkPopulation=s.value("iso4app/chkPopulation", False)
-  if checkPopulation:
-   self.dlg.chkPopulation.setChecked(True)
+  if isinstance(checkPopulation, bool):
+   if checkPopulation:
+    self.dlg.chkPopulation.setChecked(True)
+   else:
+    self.dlg.chkPopulation.setChecked(False)
   else:
-   self.dlg.chkPopulation.setChecked(False)
-   
+   if checkPopulation=="true":
+    self.dlg.chkPopulation.setChecked(True)
+   else:
+    self.dlg.chkPopulation.setChecked(False)
+  
   checkBoxLogging=s.value("iso4app/checkBoxLogging", False)
   if checkBoxLogging:
    self.dlg.checkBoxLogging.setChecked(True)
