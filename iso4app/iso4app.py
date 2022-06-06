@@ -3,7 +3,7 @@
 /***************************************************************************
  iso4app
                                  A QGIS plugin
- iso4app
+ iso4app nuovo path
                               -------------------
         begin                : 2018-02-07
         git sha              : $Format:%H$
@@ -45,7 +45,6 @@ from .iso4appService import iso4CallService
 from . import iso4app_dialog
 from . import iso4app_massive_dialog
 
-
 class MainPlugin(object):
  def __init__(self, iface):
   self.iface = iface
@@ -69,6 +68,10 @@ class MainPlugin(object):
   self.requestAK = QAction("Request Api Key",self.iface.mainWindow())
   self.requestAK.triggered.connect(self.clickRequestApiKey)
 
+  
+  self.creditsAndPlans = QAction("Credits and Plans",self.iface.mainWindow())
+  self.creditsAndPlans.triggered.connect(self.clickCreditsAndPlans)
+
   icon_path = ':/plugins/iso4app/icon.png'
   self.action = QAction(QIcon(":/plugins/iso4app/icon.png"), "Iso4App", self.iface.mainWindow())
   self.action.triggered.connect(self.run)
@@ -83,12 +86,14 @@ class MainPlugin(object):
   menuBar.addMenu(self.menu)
   self.menu.addSeparator()
   self.menu.addAction(self.requestAK)
+  self.menu.addAction(self.creditsAndPlans)
   
   self.isoline.triggered.connect(self.clickParameters)
   self.massiveIsoline.triggered.connect(self.clickMassiveIsolines)
   
   self.dlg.radioButtonIsochrone.toggled.connect(self.eventRbIsocrone)
   self.dlg.radioButtonIsodistance.toggled.connect(self.eventRbIsodistance)
+  self.dlg.radioButtonIsodistanceAir.toggled.connect(self.eventRbIsodistanceAir)
   self.dlg.comboTravelType.currentIndexChanged.connect(self.eventCbTravelType)
   self.dlg.comboSpeedType.currentIndexChanged.connect(self.eventCbSpeedType)
   self.dlg.button_box.clicked.connect(self.eventOkButton)
@@ -104,7 +109,6 @@ class MainPlugin(object):
   self.massiveDlg.pushButtonCalculate.pressed.connect(self.disableButtonGroup)
   self.massiveDlg.pushButtonCalculate.released.connect(self.calculate_massive_isolines)
   
-  #
   self.dlg.comboTravelType.addItem('Motor vehicle')
   self.dlg.comboTravelType.addItem('Bicycle')
   self.dlg.comboTravelType.addItem('Pedestrian')
@@ -174,17 +178,24 @@ class MainPlugin(object):
    apiKey='87B7FB96-83DA-4FBD-A312-7822B96BB143'
   self.dlg.lineApiKey.setText(apiKey)
   rbIsochrone=s.value("iso4app/rbIsochrone", True)
+  rbIsodistanceType=s.value("iso4app/rbIsodistanceType", "BYROAD")  
   if rbIsochrone:
    self.dlg.radioButtonIsochrone.setChecked(True)
    self.dlg.radioButtonIsodistance.setChecked(False)
    self.dlg.comboMeters.setEnabled(False)
    self.dlg.comboSeconds.setEnabled(True)
   else:
+   if rbIsodistanceType=='BYROAD':
+     self.dlg.radioButtonIsodistance.setChecked(True)
+     self.dlg.radioButtonIsodistanceAir.setChecked(False)
+     QgsMessageLog.logMessage('BYROAD!!!!!!!!!!!!!!!!:'+str(self.dlg.radioButtonIsodistance.isChecked()), 'iso4app')
+   else:
+     self.dlg.radioButtonIsodistance.setChecked(False)
+     self.dlg.radioButtonIsodistanceAir.setChecked(True)
    self.dlg.radioButtonIsochrone.setChecked(False)
-   self.dlg.radioButtonIsodistance.setChecked(True)
    self.dlg.comboMeters.setEnabled(True)
    self.dlg.comboSeconds.setEnabled(False)
-  
+
   rbPolygon=s.value("iso4app/rbPolygon", True)
   
   if rbPolygon:
@@ -279,6 +290,8 @@ class MainPlugin(object):
   if self.dlg.checkBoxLogging.isChecked():
    QgsMessageLog.logMessage('apiKey:'+apiKey, 'iso4app')
    QgsMessageLog.logMessage('rbIsochrone:'+str(self.dlg.radioButtonIsochrone.isChecked()), 'iso4app')
+   QgsMessageLog.logMessage('rbIsodistanceAir:'+str(self.dlg.radioButtonIsodistanceAir.isChecked()), 'iso4app')
+   QgsMessageLog.logMessage('radioButtonIsodistance:'+str(self.dlg.radioButtonIsodistance.isChecked()), 'iso4app')
    QgsMessageLog.logMessage('comboMeters:'+repr(comboMeters), 'iso4app')
    QgsMessageLog.logMessage('comboSeconds:'+repr(comboSeconds), 'iso4app')
    QgsMessageLog.logMessage('comboApprox:'+repr(comboApprox), 'iso4app')
@@ -301,7 +314,10 @@ class MainPlugin(object):
   
  def clickRequestApiKey(self):
   QDesktopServices.openUrl(QUrl('http://www.iso4app.com#getapikey'))
- 
+
+ def clickCreditsAndPlans(self):
+  QDesktopServices.openUrl(QUrl('http://www.iso4app.com#creditusage'))
+
  def place_iso(self, pointTriggered, button):
   try: 
    epsgCodeInput=self.canvas.mapSettings().destinationCrs().authid()
@@ -347,103 +363,14 @@ class MainPlugin(object):
  def clickMassiveIsolines(self):
   #logica
   
-  rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
-  rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
-  rbPolygon=self.dlg.radioButtonPolygon.isChecked()
-  comboMeters=self.dlg.comboMeters.currentIndex()
-  comboSeconds=self.dlg.comboMeters.currentIndex()
-  comboApprox=self.dlg.comboApprox.currentIndex()
-  comboConcavity=self.dlg.comboConcavity.currentIndex()
-  comboBuffering=self.dlg.comboBuffering.currentIndex()
-  comboSpeedType=self.dlg.comboSpeedType.currentIndex()
-  comboTravelType=self.dlg.comboTravelType.currentIndex()
-  checkBoxAvoidTolls=self.dlg.checkBoxAvoidTolls.isChecked()
-  checkBoxRestrictedArea=self.dlg.checkBoxRestrictedArea.isChecked()
-  checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()  
-  checkBoxAllowBikeOnPedestrian=self.dlg.checkBoxAllowBikeOnPedestrian.isChecked()
-  checkBoxAllowPedBikeOnTrunk=self.dlg.checkBoxAllowPedBikeOnTrunk.isChecked()
-  checkBoxFastestRoute=self.dlg.checkBoxFastestRoute.isChecked()
-  checkBoxPopulation=self.dlg.chkPopulation.isChecked()
-  speedLimit=self.dlg.lineSpeed.text()
-  self.massiveDlg.labelCriticalMsg.setText('')
+  rbIsodistanceAir=self.dlg.radioButtonIsodistanceAir.isChecked()
+  if rbIsodistanceAir:
+    isoDescr="ISODISTANCE BY AIR "
+    isoDescr += self.dlg.comboMeters.currentText()
 
-  otherParam=''
-  if checkBoxAvoidTolls:
-   otherParam+=' Avoid Tolls: YES. '
   else:
-   otherParam+=' Avoid Tolls: NO. '
-  if checkBoxRestrictedArea:
-   otherParam+=' Include Restricted Area: YES. '
-  else:
-   otherParam+=' Include Restricted Area: NO. '
-  
-  isoDescr=''
-  fastestRoutingText=''
-  if rbIsochrone:
-   isoDescr+='ISOCHRONE'
-   valueIsoline = self.dlg.comboSeconds.currentText()
-   if comboSpeedType==0:
-    speedType=' Speed:Very Low'+'.'
-   if comboSpeedType==1:
-    speedType=' Speed:Low'+'.'
-   if comboSpeedType==2:
-    speedType=' Speed:Normal'+'.'
-   if comboSpeedType==3:
-    speedType=' Speed:Fast'+'.'
-   if checkBoxReduceQueueTime:
-    otherParam+=' Reduce queue time: YES. '
-   else:
-    otherParam+=' Reduce queue time: NO. '
-   if speedLimit!='':
-    otherParam+=' Speed Limit:'+speedLimit+'.'
-  else:
-   isoDescr+='ISODISTANCE'
-   speedType=''
-   valueIsoline = self.dlg.comboMeters.currentText()
-   if checkBoxFastestRoute:
-    fastestRoutingText=' Fastest Routing: YES. '
-   
-  if rbStreetNetwork:
-   isoDescr+='(StreetNetwork)'
-  else:
-   isoDescr+='(Polygon)'
-   
-  isoDescr+=' '+valueIsoline+'.'
-  if comboTravelType==0:
-   mobility='Motor Vehicle'
-  if comboTravelType==1:
-   mobility='Bicycle'
-   if checkBoxAllowPedBikeOnTrunk:
-    otherParam+=' Bicycle on Trunk: YES. '
-   else:
-    otherParam+=' Bicycle on Trunk: NO. '
-   if checkBoxAllowBikeOnPedestrian:
-    otherParam+=' Bicycle on Pedestrian path: YES. '
-   else:
-    otherParam+=' Bicycle on Pedestrian path: NO. '
-   
-  if comboTravelType==2:
-   mobility='Pedestrian'
-   if checkBoxAllowPedBikeOnTrunk:
-    otherParam+=' Pedestrian on Trunk: YES. '
-   else:
-    otherParam+=' Pedestrian on Trunk: NO. '
-  otherParam+=' Concavity:'+repr(comboConcavity)+'. '
-  otherParam+=' Buffering:'+repr(comboBuffering)+'. '
-  
-  isoDescr+=' Mobility:'+mobility+'.'
-  isoDescr+=fastestRoutingText
-  
-  approxValue=self.dlg.comboApprox.currentText()
-  isoDescr+=' Start Point Appoximation:'+approxValue+'.'
-  isoDescr+=speedType
-  isoDescr+=otherParam
-  
-  if checkBoxPopulation:
-   isoDescr+=' Population=YES '
-  else:
-   isoDescr+=' Population=NO '
- 
+    isoDescr=getParamDescription(self)
+
   self.massiveDlg.labelIsolineDescription.setText(isoDescr)
   self.isoDescr=isoDescr
   
@@ -472,40 +399,54 @@ class MainPlugin(object):
   manageSpeed(self)
 
  def eventRbPolygon(self):
-   self.dlg.comboConcavity.setEnabled(True)
-   self.dlg.comboBuffering.setEnabled(True)
-   self.dlg.chkPopulation.setEnabled(True)
+  managePolygonOption(self)
    
  def eventRbStreetNetwork(self):
-   self.dlg.comboConcavity.setEnabled(False)
-   self.dlg.comboBuffering.setEnabled(False)
-   self.dlg.chkPopulation.setEnabled(False)
+  managePolygonOption(self)
  
  def eventRbIsocrone(self):
   isChecked=self.dlg.radioButtonIsochrone.isChecked()
   self.dlg.checkBoxFastestRoute.setEnabled(False)
-  manageSpeed(self)
+  self.dlg.comboTravelType.setEnabled(True)
+  self.dlg.comboApprox.setEnabled(True)
+  self.dlg.checkBoxAvoidTolls.setEnabled(True)
+  self.dlg.checkBoxRestrictedArea.setEnabled(True)
+  self.dlg.radioButtonStreetNetwork.setEnabled(True)
+  manageTravelType(self)
+  managePolygonOption(self)
 
  def eventRbIsodistance(self):
+  self.dlg.comboMeters.setEnabled(True)
   idx=self.dlg.comboTravelType.currentIndex()
+  self.dlg.comboTravelType.setEnabled(True)
+  self.dlg.comboApprox.setEnabled(True)
+  self.dlg.checkBoxAvoidTolls.setEnabled(True)
+  self.dlg.checkBoxRestrictedArea.setEnabled(True)
+  self.dlg.radioButtonStreetNetwork.setEnabled(True)
   if idx==0:
    self.dlg.checkBoxFastestRoute.setEnabled(True)
 
+  manageTravelType(self)
+  managePolygonOption(self)
+
+ def eventRbIsodistanceAir(self):
+   self.dlg.comboMeters.setEnabled(True)
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
+   self.dlg.comboTravelType.setEnabled(False)
+   self.dlg.comboApprox.setEnabled(False)
+   self.dlg.checkBoxAvoidTolls.setEnabled(False)
+   self.dlg.checkBoxRestrictedArea.setEnabled(False)
+   self.dlg.radioButtonStreetNetwork.setEnabled(False)
+   self.dlg.radioButtonPolygon.setChecked(True)
+   self.dlg.comboConcavity.setEnabled(False)
+   self.dlg.comboBuffering.setEnabled(False)
+   self.dlg.chkPopulation.setEnabled(False)
+   self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(False)
+   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(False)
+
+
  def eventCbTravelType(self):
-  idx=self.dlg.comboTravelType.currentIndex()
-  self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(False)
-  self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(False)
-  self.dlg.checkBoxFastestRoute.setEnabled(True)
-  if idx==1:
-   self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(True)
-   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
-   self.dlg.checkBoxFastestRoute.setEnabled(False)
-  if idx==2:
-   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
-   self.dlg.checkBoxFastestRoute.setEnabled(False)
-  if self.dlg.radioButtonIsochrone.isChecked():
-   self.dlg.checkBoxFastestRoute.setEnabled(False)
-  manageSpeed(self)
+  manageTravelType(self)
 
  def eventLnkAvailableCountries(self):
   QDesktopServices.openUrl(QUrl('http://www.iso4app.com/thematicMap.jsp'))
@@ -821,7 +762,134 @@ def diffMillis(firstT,currT):
  millis += diff.seconds * 1000
  millis += diff.microseconds / 1000
  return millis
- 
+
+def getParamDescription(self):
+  rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
+  rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
+  rbPolygon=self.dlg.radioButtonPolygon.isChecked()
+  comboMeters=self.dlg.comboMeters.currentIndex()
+  comboSeconds=self.dlg.comboMeters.currentIndex()
+  comboApprox=self.dlg.comboApprox.currentIndex()
+  comboConcavity=self.dlg.comboConcavity.currentIndex()
+  comboBuffering=self.dlg.comboBuffering.currentIndex()
+  comboSpeedType=self.dlg.comboSpeedType.currentIndex()
+  comboTravelType=self.dlg.comboTravelType.currentIndex()
+  checkBoxAvoidTolls=self.dlg.checkBoxAvoidTolls.isChecked()
+  checkBoxRestrictedArea=self.dlg.checkBoxRestrictedArea.isChecked()
+  checkBoxReduceQueueTime=self.dlg.checkBoxReduceQueueTime.isChecked()  
+  checkBoxAllowBikeOnPedestrian=self.dlg.checkBoxAllowBikeOnPedestrian.isChecked()
+  checkBoxAllowPedBikeOnTrunk=self.dlg.checkBoxAllowPedBikeOnTrunk.isChecked()
+  checkBoxFastestRoute=self.dlg.checkBoxFastestRoute.isChecked()
+  checkBoxPopulation=self.dlg.chkPopulation.isChecked()
+  speedLimit=self.dlg.lineSpeed.text()
+  self.massiveDlg.labelCriticalMsg.setText('')
+
+  otherParam=''
+  
+  if checkBoxAvoidTolls:
+   otherParam+=' Avoid Tolls: YES. '
+  else:
+   otherParam+=' Avoid Tolls: NO. '
+  if checkBoxRestrictedArea:
+   otherParam+=' Include Restricted Area: YES. '
+  else:
+   otherParam+=' Include Restricted Area: NO. '
+  
+  isoDescr=''
+  fastestRoutingText=''
+  if rbIsochrone:
+   isoDescr+='ISOCHRONE'
+   valueIsoline = self.dlg.comboSeconds.currentText()
+   if comboSpeedType==0:
+    speedType=' Speed:Very Low'+'.'
+   if comboSpeedType==1:
+    speedType=' Speed:Low'+'.'
+   if comboSpeedType==2:
+    speedType=' Speed:Normal'+'.'
+   if comboSpeedType==3:
+    speedType=' Speed:Fast'+'.'
+   if checkBoxReduceQueueTime:
+    otherParam+=' Reduce queue time: YES. '
+   else:
+    otherParam+=' Reduce queue time: NO. '
+   if speedLimit!='':
+    otherParam+=' Speed Limit:'+speedLimit+'.'
+  else:
+   isoDescr+='ISODISTANCE'
+   speedType=''
+   valueIsoline = self.dlg.comboMeters.currentText()
+   if checkBoxFastestRoute:
+    fastestRoutingText=' Fastest Routing: YES. '
+   
+  if rbStreetNetwork:
+   isoDescr+='(StreetNetwork)'
+  else:
+   isoDescr+='(Polygon)'
+   
+  isoDescr+=' '+valueIsoline+'.'
+  if comboTravelType==0:
+   mobility='Motor Vehicle'
+  if comboTravelType==1:
+   mobility='Bicycle'
+   if checkBoxAllowPedBikeOnTrunk:
+    otherParam+=' Bicycle on Trunk: YES. '
+   else:
+    otherParam+=' Bicycle on Trunk: NO. '
+   if checkBoxAllowBikeOnPedestrian:
+    otherParam+=' Bicycle on Pedestrian path: YES. '
+   else:
+    otherParam+=' Bicycle on Pedestrian path: NO. '
+   
+  if comboTravelType==2:
+   mobility='Pedestrian'
+   if checkBoxAllowPedBikeOnTrunk:
+    otherParam+=' Pedestrian on Trunk: YES. '
+   else:
+    otherParam+=' Pedestrian on Trunk: NO. '
+  otherParam+=' Concavity:'+repr(comboConcavity)+'. '
+  otherParam+=' Buffering:'+repr(comboBuffering)+'. '
+  
+  isoDescr+=' Mobility:'+mobility+'.'
+  isoDescr+=fastestRoutingText
+  
+  approxValue=self.dlg.comboApprox.currentText()
+  isoDescr+=' Start Point Appoximation:'+approxValue+'.'
+  isoDescr+=speedType
+  isoDescr+=otherParam
+  
+  if checkBoxPopulation:
+   isoDescr+=' Population=YES '
+  else:
+   isoDescr+=' Population=NO '
+  return isoDescr
+
+def managePolygonOption(self):
+ isChecked=self.dlg.radioButtonPolygon.isChecked()
+ if isChecked==True :
+  self.dlg.comboConcavity.setEnabled(True)
+  self.dlg.comboBuffering.setEnabled(True)
+  self.dlg.chkPopulation.setEnabled(True)
+ else:
+  self.dlg.comboConcavity.setEnabled(False)
+  self.dlg.comboBuffering.setEnabled(False)
+  self.dlg.chkPopulation.setEnabled(False)
+
+def manageTravelType(self):
+  idx=self.dlg.comboTravelType.currentIndex()
+  self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(False)
+  self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(False)
+  self.dlg.checkBoxFastestRoute.setEnabled(True)
+  if idx==1:
+   self.dlg.checkBoxAllowBikeOnPedestrian.setEnabled(True)
+   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
+  if idx==2:
+   self.dlg.checkBoxAllowPedBikeOnTrunk.setEnabled(True)
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
+  if self.dlg.radioButtonIsochrone.isChecked():
+   self.dlg.checkBoxFastestRoute.setEnabled(False)
+  manageSpeed(self)
+
 def manageSpeed(self):
  idxTT=self.dlg.comboTravelType.currentIndex()
  idxST=self.dlg.comboSpeedType.currentIndex()

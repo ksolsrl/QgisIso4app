@@ -86,6 +86,7 @@ class iso4CallService(object):
   #chiamata al servizio iso4app  rest
   aiKey=self.dlg.lineApiKey.text()
   speedLimit=self.dlg.lineSpeed.text()
+  rbIsodistanceAir=self.dlg.radioButtonIsodistanceAir.isChecked()
   rbIsochrone=self.dlg.radioButtonIsochrone.isChecked()
   rbPolygon=self.dlg.radioButtonPolygon.isChecked()
   rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
@@ -106,81 +107,82 @@ class iso4CallService(object):
   checkBoxPopulation=self.dlg.chkPopulation.isChecked()
 
   visualizationType=""
-  restUrl='http://www.iso4app.net/rest/1.3/isoline.json?licKey='+aiKey
-  if rbIsochrone==True:
-   restUrl=restUrl+'&type=isochrone'
-   valueIsochrone = self.dlg.comboSeconds.currentText()
-   minutes=int(valueIsochrone.split(' ')[0])
-   seconds=minutes*60
-   if self.overWrittenDistance is not None:
-    seconds=self.overWrittenDistance*60
-   distances=repr(seconds) 
+
+  if rbIsodistanceAir==True:
+   restUrl='http://www.iso4app.com/rest/1.3/airDistance.json?licKey='+aiKey
+   distances=getMeterDistance(self)
+   restUrl=restUrl+'&value='+distances   
+   restUrl=restUrl+'&lat='+repr(pt.y())
+   restUrl=restUrl+'&lng='+repr(pt.x())
+   mobility='air'
   else:
-   restUrl=restUrl+'&type=isodistance'
-   valueIsodistance = self.dlg.comboMeters.currentText()
-   tmpValue=int(valueIsodistance.split(' ')[0])
-   unit=valueIsodistance.split(' ')[1]
-   if unit=='meters':
-    meters=tmpValue
-   if unit=='km':
-    meters=tmpValue*1000
-   if self.overWrittenDistance is not None:
-    meters=self.overWrittenDistance
-   distances=repr(meters) 
+   restUrl='http://www.iso4app.com/rest/1.3/isoline.json?licKey='+aiKey
+
+   if rbIsochrone==True:
+    restUrl=restUrl+'&type=isochrone'
+    valueIsochrone = self.dlg.comboSeconds.currentText()
+    minutes=int(valueIsochrone.split(' ')[0])
+    seconds=minutes*60
+    if self.overWrittenDistance is not None:
+     seconds=self.overWrittenDistance*60
+    distances=repr(seconds) 
+   else:
+    restUrl=restUrl+'&type=isodistance'
+    distances=getMeterDistance(self)
    
-  restUrl=restUrl+'&value='+distances
-  restUrl=restUrl+'&lat='+repr(pt.y())
-  restUrl=restUrl+'&lng='+repr(pt.x())
- 
-  approxValue=self.dlg.comboApprox.currentText()
-  approx=int(approxValue.split(' ')[0])
-  restUrl=restUrl+'&approx='+ repr(approx)
+   restUrl=restUrl+'&value='+distances
+   restUrl=restUrl+'&lat='+repr(pt.y())
+   restUrl=restUrl+'&lng='+repr(pt.x())
   
-  if comboTravelType==0:
-   mobility='motor_vehicle'
-  if comboTravelType==1:
-   mobility='bicycle'
-  if comboTravelType==2:
-   mobility='pedestrian'
+   approxValue=self.dlg.comboApprox.currentText()
+   approx=int(approxValue.split(' ')[0])
+   restUrl=restUrl+'&approx='+ repr(approx)
    
-  restUrl=restUrl+'&mobility='+mobility
-
-  if comboSpeedType==0:
-   speedType='very_low'
-  if comboSpeedType==1:
-   speedType='low'
-  if comboSpeedType==2:
-   speedType='normal'
-  if comboSpeedType==3:
-   speedType='fast'
-   
-  restUrl=restUrl+'&speedType='+speedType
-
-  if checkBoxFastestRoute:
-   restUrl=restUrl+'&fastestRouting=true'
-  if checkBoxReduceQueueTime:
-   restUrl=restUrl+'&reduceQueue=true'
-  if checkBoxAvoidTolls:
-   restUrl=restUrl+'&avoidTolls=true'
-  if checkBoxRestrictedArea==False:
-   restUrl=restUrl+'&restrictedAreas=false'
-  if checkBoxAllowPedBikeOnTrunk:
-   restUrl=restUrl+'&pedestrianAnbBikeOnTrunk=true'
-  if checkBoxAllowBikeOnPedestrian:
-   restUrl=restUrl+'&bicycleOnPedestrian=true'
-  if speedLimit!='':
-   restUrl=restUrl+'&speedLimit='+speedLimit
-
-  restUrl=restUrl+'&buffering='+repr(comboBuffering)
-  restUrl=restUrl+'&concavity='+repr(comboConcavity)
-  restUrl=restUrl+'&caller=Qgis'
+   if comboTravelType==0:
+    mobility='motor_vehicle'
+   if comboTravelType==1:
+    mobility='bicycle'
+   if comboTravelType==2:
+    mobility='pedestrian'
+    
+   restUrl=restUrl+'&mobility='+mobility 
   
-  if rbPolygon:
-   restUrl=restUrl+'&visualizationType=polygon'
-   if checkBoxPopulation:
-    restUrl=restUrl+'&addPopIfAvailable=true'
-  if rbStreetNetwork==True:
-   restUrl=restUrl+'&visualizationType=street_network_no_range'
+   if comboSpeedType==0:
+    speedType='very_low'
+   if comboSpeedType==1:
+    speedType='low'
+   if comboSpeedType==2:
+    speedType='normal'
+   if comboSpeedType==3:
+    speedType='fast'
+   
+   restUrl=restUrl+'&speedType='+speedType
+  
+   if checkBoxFastestRoute:
+    restUrl=restUrl+'&fastestRouting=true'
+   if checkBoxReduceQueueTime:
+    restUrl=restUrl+'&reduceQueue=true'
+   if checkBoxAvoidTolls:
+    restUrl=restUrl+'&avoidTolls=true'
+   if checkBoxRestrictedArea==False:
+    restUrl=restUrl+'&restrictedAreas=false'
+   if checkBoxAllowPedBikeOnTrunk:
+    restUrl=restUrl+'&pedestrianAnbBikeOnTrunk=true'
+   if checkBoxAllowBikeOnPedestrian:
+    restUrl=restUrl+'&bicycleOnPedestrian=true'
+   if speedLimit!='':
+    restUrl=restUrl+'&speedLimit='+speedLimit
+
+   restUrl=restUrl+'&buffering='+repr(comboBuffering)
+   restUrl=restUrl+'&concavity='+repr(comboConcavity)
+   restUrl=restUrl+'&caller=Qgis'
+  
+   if rbPolygon:
+    restUrl=restUrl+'&visualizationType=polygon'
+    if checkBoxPopulation:
+     restUrl=restUrl+'&addPopIfAvailable=true'
+   if rbStreetNetwork==True:
+    restUrl=restUrl+'&visualizationType=street_network_no_range'
   
   
   if self.dlg.checkBoxLogging.isChecked():
@@ -213,6 +215,9 @@ class iso4CallService(object):
    distance=root['value']
    unit='seconds'
    if isoType=='ISODISTANCE':
+    unit='meters'
+
+   if isoType=='ISODISTANCEBYAIR':
     unit='meters'
 
    epsgCodeCanvasNumber=int(self.epsgCodeCanvas.split(':')[1])
@@ -393,6 +398,17 @@ class iso4CallService(object):
 
   
   QgsMessageLog.logMessage('callIsoline end', 'iso4app')
-  
-  
-  
+
+def getMeterDistance(self):
+  valueIsodistance = self.dlg.comboMeters.currentText()
+  tmpValue=int(valueIsodistance.split(' ')[0])
+  unit=valueIsodistance.split(' ')[1]
+  if unit=='meters':
+   meters=tmpValue
+  if unit=='km':
+   meters=tmpValue*1000
+  if self.overWrittenDistance is not None:
+   meters=self.overWrittenDistance
+
+  distances=repr(meters) 
+  return distances
