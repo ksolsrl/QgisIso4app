@@ -10,7 +10,7 @@
 name=iso4app
 qgisMinimumVersion=3.20.1
 description=iso4app isochrone/isodistance
-version=1.4
+version=1.5
 author=Maurizio Moscati K-SOL SRL
 email=info@k-sol.it
 
@@ -23,7 +23,7 @@ repository=https://github.com/ksolsrl/QgisIso4app
 # Recommended items:
 
 # Uncomment the following line and add your changelog:
-changelog=New feature: isodistance by air. This version require QT minimum version 5.12.
+changelog=Bug Fix. Error solved:  "QgsMapToPixel.toMapCoordinates(): arguments did not match any overloaded call"
 
 # Tags are comma separated with spaces allowed
 tags=isochrone,catchment area, street network, population

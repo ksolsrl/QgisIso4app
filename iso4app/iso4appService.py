@@ -59,13 +59,14 @@ class iso4CallService(object):
   return self.rc
   
  def callIsoline(self):
-  QgsMessageLog.logMessage('callIsoline place_iso start', 'iso4app')
-  point = self.canvas.getCoordinateTransform().toMapPoint(self.pointTriggered.x(),self.pointTriggered.y())
-  pointc = self.canvas.getCoordinateTransform().toMapCoordinates(self.pointTriggered.x(),self.pointTriggered.y())
+  #2024 commento variabili non utilizzate e chiamata toMapCoordinates non compatibile con versioni successive di QGis
+  #QgsMessageLog.logMessage('callIsoline place_iso start', 'iso4app')
+  #point = self.canvas.getCoordinateTransform().toMapPoint(self.pointTriggered.x(),self.pointTriggered.y())
+  #pointc = self.canvas.getCoordinateTransform().toMapCoordinates(self.pointTriggered.x(),self.pointTriggered.y())
     
   QgsMessageLog.logMessage('callIsoline start', 'iso4app')
-  point = self.canvas.getCoordinateTransform().toMapPoint(self.pointTriggered.x(),self.pointTriggered.y())
-  pointc = self.canvas.getCoordinateTransform().toMapCoordinates(self.pointTriggered.x(),self.pointTriggered.y())
+  #point = self.canvas.getCoordinateTransform().toMapPoint(self.pointTriggered.x(),self.pointTriggered.y())
+  #pointc = self.canvas.getCoordinateTransform().toMapCoordinates(self.pointTriggered.x(),self.pointTriggered.y())
   
   lng=self.pointTriggered.x()
   lat=self.pointTriggered.y()
