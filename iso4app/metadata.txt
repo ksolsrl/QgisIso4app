@@ -10,7 +10,7 @@
 name=iso4app
 qgisMinimumVersion=4.0
 description=iso4app isochrone/isodistance
-version=1.6
+version=1.7
 author=Maurizio Moscati K-SOL SRL
 email=info@k-sol.it
 

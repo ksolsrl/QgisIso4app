@@ -190,7 +190,7 @@ class iso4CallService(object):
    QgsMessageLog.logMessage('callIsoline restUrl:'+restUrl, 'iso4app')
   
   try:
-   response = requests.get(restUrl)
+   response = requests.get(restUrl, timeout=240)
    if self.dlg.checkBoxLogging.isChecked():
     QgsMessageLog.logMessage('callIsoline response.text:'+response.text, 'iso4app')
 
