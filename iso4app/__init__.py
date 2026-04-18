@@ -21,7 +21,6 @@
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
-from __future__ import absolute_import
 
 def name():
     return "Iso4app isochrone/isodistance plugin"
@@ -30,13 +29,13 @@ def description():
     return "Creates isochrone/isodistance on the map." 
 
 def version():
-    return "Version 1.0"
+    return "Version 2.0"
 
 def icon():
     return "icon.png"
 
 def qgisMinimumVersion():
-    return "2.18.16"
+    return "4.0"
 
 def author():
     return "K-SOL SRL"

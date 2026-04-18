@@ -42,7 +42,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -79,7 +78,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -101,7 +99,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -133,7 +130,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -155,7 +151,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -181,7 +176,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -208,7 +202,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -236,7 +229,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -262,7 +254,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -286,7 +277,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -311,7 +301,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -330,7 +319,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -352,7 +340,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -371,7 +358,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -393,7 +379,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -405,7 +390,7 @@
      <string/>
     </property>
     <property name="alignment">
-     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
     </property>
     <property name="wordWrap">
      <bool>true</bool>
@@ -434,7 +419,7 @@
     <string>Set parameters -&gt; click OK -&gt; click on a road on the map.</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignCenter</set>
+    <set>Qt::AlignmentFlag::AlignCenter</set>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -920,7 +905,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -950,7 +934,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -1007,7 +990,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -1035,7 +1017,6 @@
      <font>
       <family>Arial</family>
       <pointsize>8</pointsize>
-      <weight>50</weight>
       <italic>false</italic>
       <bold>false</bold>
      </font>
@@ -1061,7 +1042,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -1099,7 +1079,6 @@
     <font>
      <family>Arial</family>
      <pointsize>8</pointsize>
-     <weight>50</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -1299,7 +1278,7 @@
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::FocusPolicy::NoFocus</enum>
     </property>
     <property name="text">
      <string>See avaliable countries</string>

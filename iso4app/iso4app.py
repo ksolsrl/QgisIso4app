@@ -20,24 +20,27 @@
  *                                                                         *
  ***************************************************************************/
 """
-from __future__ import absolute_import
 from time import sleep
-from builtins import str
-from builtins import range
-from builtins import object
 import os
-import sys
-import tempfile
-import gettext
 from . import resources
 import datetime
-from time import sleep
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import QAction,QMenu,QApplication,QTableWidget,QTableWidgetItem,QProgressBar,QProgressDialog
-from qgis.core import *
-from qgis.utils import *
-from qgis.gui import *
+from qgis.PyQt import QtWidgets, QtGui, QtCore
+from qgis.PyQt.QtWidgets import QMenu, QApplication, QTableWidget, QTableWidgetItem, QProgressBar, QProgressDialog
+from qgis.PyQt.QtCore import Qt, QUrl
+from qgis.PyQt.QtCore import QSettings
+from qgis.core import (
+    QgsVectorLayer,
+    QgsProject,
+    QgsFeature,
+    QgsGeometry
+)
+from qgis.core import Qgis
+from qgis.core import QgsMessageLog
+from qgis.core import QgsCoordinateReferenceSystem, QgsCoordinateTransform
+from qgis.PyQt.QtGui import QIcon, QAction
+from qgis.PyQt.QtGui import QDesktopServices
+from qgis.PyQt.QtGui import QCursor
+from qgis.gui import QgsMapToolEmitPoint
 from .iso4app_dialog import iso4appDialog
 from .iso4appApi import isoline
 from .iso4appApi import massiveIsoline
@@ -80,8 +83,8 @@ class MainPlugin(object):
 
   #connessione menù alla azione isoline
   self.menu=QMenu("Iso4App")
-  self.menu.addActions([self.isoline])
-  self.menu.addActions([self.massiveIsoline])
+  self.menu.addAction(self.isoline)
+  self.menu.addAction(self.massiveIsoline) 
   menuBar = self.iface.mainWindow().menuBar()
   menuBar.addMenu(self.menu)
   self.menu.addSeparator()
@@ -334,7 +337,7 @@ class MainPlugin(object):
    vlyrPoly = QgsVectorLayer("Polygon?crs="+epsgCodeCanvas, layernamePoly, "memory")
 
   vlyrPin =  QgsVectorLayer("Point?crs="+epsgCodeCanvas+"&field=id:integer&field=description:string(120)&field=x:double&field=y:double&index=yes",layernamePin,"memory")
-  QApplication.setOverrideCursor(Qt.WaitCursor)
+  QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
   instancei4a=None
   try:
    instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointTriggered,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,'','',None)
@@ -359,7 +362,7 @@ class MainPlugin(object):
   
   
  def clickParameters(self):
-  self.dlg.exec_()
+  self.dlg.exec()
  def clickMassiveIsolines(self):
   #logica
   
@@ -389,8 +392,8 @@ class MainPlugin(object):
    layersNames.append(lName)
    #QgsMessageLog.logMessage('calculate_massive_isolines lName:'+repr(lName), 'iso4app')
    self.massiveDlg.comboBoxLayers.addItem(lName)
-  
-  self.massiveDlg.exec_() 
+  QgsMessageLog.logMessage('clickMassiveIsolines before EXEC')
+  self.massiveDlg.exec() 
   
  def unload(self):
   pass
@@ -490,7 +493,7 @@ class MainPlugin(object):
 
      okIso=0
      errIso=0
-     QApplication.setOverrideCursor(Qt.WaitCursor)
+     QApplication.setOverrideCursor(QCursor(Qt.CursorShape.WaitCursor))
      try:
       rowCount=self.massiveDlg.tableWidgetPoints.rowCount()
       for row in range(0,rowCount):
@@ -519,6 +522,7 @@ class MainPlugin(object):
         instancei4a=iso4CallService(self.iface,self.canvas,self.dlg,pointData,epsgCodeInput,epsgCodeCanvas,vlyrPin,vlyrPoly,attributeName4Layer,attributeValue4Layer, overWrittenDistance)
         rc=instancei4a.rc
         rcMessageCritical=instancei4a.rcMessageCritical
+        QgsMessageLog.logMessage('calculate_massive_isolines rc:'+repr(rc),'iso4app')
         if rc==0:
          self.massiveDlg.tableWidgetPoints.item(row,3).setText('OK')
          okIso=okIso+1
@@ -533,12 +537,14 @@ class MainPlugin(object):
         self.massiveDlg.lineEditTotaPointError.setText(repr(errIso))
         firstT = datetime.datetime.now() 
         sleep(1)
-        iface.statusBarIface().showMessage("Processed:"+str(row+1)+ ' of:'+str(rowCount))
+        QgsMessageLog.logMessage('calculate_massive_isolines before iface','iso4app')
+        self.iface.statusBarIface().showMessage("Processed:"+str(row+1)+ ' of:'+str(rowCount))
+        QgsMessageLog.logMessage('calculate_massive_isolines after iface','iso4app')
         self.iface.mainWindow().repaint()
        else:
         self.iface.mainWindow().repaint()
       
-      iface.statusBarIface().clearMessage()
+      self.iface.statusBarIface().clearMessage()
       if okIso>0:
        vlyrPoly.setOpacity(0.5)
        if self.dlg.radioButtonStreetNetwork.isChecked()==True:
@@ -553,9 +559,9 @@ class MainPlugin(object):
      QApplication.restoreOverrideCursor()
      self.canvas.refresh()
     else:
-     self.iface.messageBar().pushMessage("Iso4App", 'Selected Layer has not any points!', level=2)
+     self.iface.messageBar().pushMessage("Iso4App", 'Selected Layer has not any points!', level=Qgis.MessageLevel.Warning,duration=8)
    else:
-    self.iface.messageBar().pushMessage("Iso4App", 'Layer name required!', level=2)
+    self.iface.messageBar().pushMessage("Iso4App", 'Layer name required!', level=Qgis.MessageLevel.Warning,duration=8)
    #comunque riabilito
    self.massiveDlg.pushButtonClose.setEnabled(True)
    self.timeStampLastMassiveRunning=datetime.datetime.now() 

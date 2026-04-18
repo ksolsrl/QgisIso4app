@@ -28,17 +28,27 @@ import os
 import sys
 import tempfile
 import gettext
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from qgis.core import *
-from qgis.gui import *
+# -*- coding: utf-8 -*-
+
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import QAction, QApplication
+
+from qgis.core import (
+    QgsMessageLog,
+    QgsVectorLayer,
+    QgsProject,
+    QgsCoordinateReferenceSystem,
+    QgsCoordinateTransform,
+    QgsFeature,
+    QgsGeometry,
+    QgsPoint,
+    QgsPointXY,
+    QgsField
+)
+from qgis.gui import QgsMapTool
 import json
 import requests
-from PyQt5.QtWidgets import QAction,QApplication
 from .iso4appService import iso4CallService
-
-
-
 
 class iaAction(QAction):
  def __init__(self,name,iface,dlg):

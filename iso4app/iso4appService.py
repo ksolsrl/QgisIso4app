@@ -27,8 +27,8 @@ import os
 import sys
 import tempfile
 import gettext
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
 from qgis.core import *
 from qgis.gui import *
 import json
@@ -56,7 +56,7 @@ class iso4CallService(object):
   self.callIsoline()
   return None
  def __str__(self):
-  return self.rc
+  return str(self.rc) 
   
  def callIsoline(self):
   #2024 commento variabili non utilizzate e chiamata toMapCoordinates non compatibile con versioni successive di QGis
@@ -92,7 +92,7 @@ class iso4CallService(object):
   rbPolygon=self.dlg.radioButtonPolygon.isChecked()
   rbStreetNetwork=self.dlg.radioButtonStreetNetwork.isChecked()
   comboMeters=self.dlg.comboMeters.currentIndex()
-  comboSeconds=self.dlg.comboMeters.currentIndex()
+  comboSeconds=self.dlg.comboSeconds.currentIndex()
   comboApprox=self.dlg.comboApprox.currentIndex()
   comboConcavity=self.dlg.comboConcavity.currentIndex()
   comboBuffering=self.dlg.comboBuffering.currentIndex()
@@ -111,7 +111,7 @@ class iso4CallService(object):
 
   if rbIsodistanceAir==True:
    restUrl='http://www.iso4app.com/rest/1.3/airDistance.json?licKey='+aiKey
-   distances=getMeterDistance(self)
+   distances = self.getMeterDistance()
    restUrl=restUrl+'&value='+distances   
    restUrl=restUrl+'&lat='+repr(pt.y())
    restUrl=restUrl+'&lng='+repr(pt.x())
